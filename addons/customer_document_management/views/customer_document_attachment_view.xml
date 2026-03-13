@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_customer_document_attachment_form" model="ir.ui.view">
+            <field name="name">customer.document.attachment.form</field>
+            <field name="model">customer.document.attachment</field>
+            <field name="arch" type="xml">
+                <form string="Document Attachment">
+                    <group>
+                        <group>
+                            <field name="document_id"/>
+                            <field name="name"/>
+                            <field name="attachment_id"/>
+                        </group>
+                        <group>
+                            <field name="version" readonly="1"/>
+                            <field name="is_main_file"/>
+                            <field name="file_type" readonly="1"/>
+                            <field name="file_size" readonly="1" widget="float_time"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="uploaded_by" readonly="1"/>
+                            <field name="upload_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="description" nolabel="1" colspan="2"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_customer_document_attachment_list" model="ir.ui.view">
+            <field name="name">customer.document.attachment.list</field>
+            <field name="model">customer.document.attachment</field>
+            <field name="arch" type="xml">
+                <tree string="Attachments" decoration-info="is_main_file">
+                    <field name="name"/>
+                    <field name="document_id"/>
+                    <field name="file_type"/>
+                    <field name="version"/>
+                    <field name="is_main_file"/>
+                    <field name="uploaded_by"/>
+                    <field name="upload_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_customer_document_attachment" model="ir.actions.act_window">
+            <field name="name">Attachments</field>
+            <field name="res_model">customer.document.attachment</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

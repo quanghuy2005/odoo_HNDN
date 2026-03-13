@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Sequence for Document Reference -->
+        <record id="seq_customer_document" model="ir.sequence">
+            <field name="name">Customer Document Sequence</field>
+            <field name="code">customer.document.seq</field>
+            <field name="prefix">DOC-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+        </record>
+    </data>
+</odoo>
