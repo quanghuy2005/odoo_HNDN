@@ -15,7 +15,7 @@
     ],
     'installable': True,
     'auto_install': False,
-    'application': False,
+    'application': True,
     'sequence': 2,
     'summary': 'Mở rộng quản lý nhân sự: khách hàng phụ trách, tài liệu liên kết',
     'external_dependencies': {},

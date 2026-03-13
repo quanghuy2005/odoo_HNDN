@@ -15,7 +15,7 @@
     ],
     'installable': True,
     'auto_install': False,
-    'application': False,
+    'application': True,
     'sequence': 1,
     'summary': 'Quản lý thông tin khách hàng, tiềm năng kinh doanh, lịch sử giao dịch',
 }
