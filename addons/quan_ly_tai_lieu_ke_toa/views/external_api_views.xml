@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- GOOGLE DRIVE CONFIGURATION -->
+        <record id="view_google_drive_form" model="ir.ui.view">
+            <field name="name">google.drive.integration.form</field>
+            <field name="model">google.drive.integration</field>
+            <field name="arch" type="xml">
+                <form string="Cấu Hình Google Drive">
+                    <sheet>
+                        <button name="test_connection" string="Test Kết Nối" type="object" class="oe_highlight"/>
+                        <group>
+                            <group>
+                                <field name="ten_config"/>
+                                <field name="thu_muc_cha_id" widget="text"/>
+                                <field name="bat_backup"/>
+                            </group>
+                            <group>
+                                <field name="backup_khi_tao"/>
+                                <field name="backup_khi_phe_duyet"/>
+                                <field name="backup_khi_ky"/>
+                                <field name="backup_khi_hoan_tat"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="service_account_json" nolabel="1" colspan="2" widget="ace"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_google_drive_tree" model="ir.ui.view">
+            <field name="name">google.drive.integration.tree</field>
+            <field name="model">google.drive.integration</field>
+            <field name="arch" type="xml">
+                <tree string="Google Drive Configurations">
+                    <field name="ten_config"/>
+                    <field name="thu_muc_cha_id"/>
+                    <field name="bat_backup"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_google_drive" model="ir.actions.act_window">
+            <field name="name">Google Drive Backup</field>
+            <field name="res_model">google.drive.integration</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- AI CONFIGURATION -->
+        <record id="view_ai_config_form" model="ir.ui.view">
+            <field name="name">ai.configuration.form</field>
+            <field name="model">ai.configuration</field>
+            <field name="arch" type="xml">
+                <form string="Cấu Hình AI">
+                    <sheet>
+                        <button name="test_api_connection" string="Test API" type="object" class="oe_highlight"/>
+                        <group>
+                            <group>
+                                <field name="ten_config"/>
+                                <field name="loai_ai"/>
+                                <field name="model_name"/>
+                            </group>
+                            <group>
+                                <field name="do_dai_tom_tat"/>
+                                <field name="ngon_ngu"/>
+                                <field name="bat_tom_tat"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="api_key" password="True" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_ai_config_tree" model="ir.ui.view">
+            <field name="name">ai.configuration.tree</field>
+            <field name="model">ai.configuration</field>
+            <field name="arch" type="xml">
+                <tree string="AI Configurations">
+                    <field name="ten_config"/>
+                    <field name="loai_ai"/>
+                    <field name="bat_tom_tat" widget="boolean"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_ai_config" model="ir.actions.act_window">
+            <field name="name">AI Tóm Tắt &amp; Phân Loại</field>
+            <field name="res_model">ai.configuration</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- MENU SETTINGS -->
+        <menuitem id="menu_settings_root" name="Cấu Hình Nâng Cao"
+            parent="menu_tai_lieu_sub" sequence="10"/>
+
+        <menuitem id="menu_google_drive_settings" name="Google Drive Backup"
+            parent="menu_settings_root" action="action_google_drive" sequence="1"/>
+
+        <menuitem id="menu_ai_settings" name="AI Tóm Tắt"
+            parent="menu_settings_root" action="action_ai_config" sequence="2"/>
+
+    </data>
+</odoo>

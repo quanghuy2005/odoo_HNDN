@@ -23,6 +23,7 @@
         'views/phieu_phe_duyet_view.xml',
         'views/dinh_kem_file_view.xml',
         'views/nhan_vien_view.xml',
+        'views/external_api_views.xml',
     ],
     'installable': True,
     'auto_install': False,
@@ -37,5 +38,10 @@
     - Số hóa hồ sơ khách hàng
     - Tích hợp email thông báo
     - Tracking version và lịch sử
+    - Google Drive Backup tự động
+    - AI Tóm Tắt & Phân Loại
     ''',
+    'external_dependencies': {
+        'python': ['anthropic', 'google-auth-httplib2', 'google-auth-oauthlib', 'openai'],
+    },
 }
