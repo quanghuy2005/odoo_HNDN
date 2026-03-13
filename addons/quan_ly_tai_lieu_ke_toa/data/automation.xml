@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- AUTOMATION 1: Khi yêu cầu phê duyệt → gửi email -->
+        <record id="automation_gui_phe_duyet" model="base.automation">
+            <field name="name">Gửi Email - Yêu Cầu Phê Duyệt</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="trigger">on_write</field>
+            <field name="trg_date_id" ref="tai_lieu_ke_toa_ngay_tao"/>
+            <field name="sort" eval="1"/>
+            <field name="active">True</field>
+            <field name="filter_domain">[('trang_thai', '=', 'dang_duyet')]</field>
+            <field name="act_mail_to_user">True</field>
+            <field name="email_template_id" ref="email_template_yeu_cau_phe_duyet"/>
+        </record>
+
+        <!-- AUTOMATION 2: Khi phê duyệt xong → gửi email cho người tạo -->
+        <record id="automation_da_phe_duyet" model="base.automation">
+            <field name="name">Gửi Email - Đã Phê Duyệt</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="trigger">on_write</field>
+            <field name="sort" eval="2"/>
+            <field name="active">True</field>
+            <field name="filter_domain">[('trang_thai', '=', 'da_phe_duyet')]</field>
+            <field name="act_mail_to_user">True</field>
+            <field name="email_template_id" ref="email_template_da_phe_duyet"/>
+        </record>
+
+        <!-- AUTOMATION 3: Khi ký xong → gửi thông báo -->
+        <record id="automation_da_ky" model="base.automation">
+            <field name="name">Gửi Email - Đã Ký</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="trigger">on_write</field>
+            <field name="sort" eval="3"/>
+            <field name="active">True</field>
+            <field name="filter_domain">[('trang_thai', '=', 'da_ky')]</field>
+            <field name="act_mail_to_user">True</field>
+            <field name="email_template_id" ref="email_template_da_ky"/>
+        </record>
+
+        <!-- AUTOMATION 4: Khi hoàn tất → gửi email cho khách hàng -->
+        <record id="automation_hoan_tat" model="base.automation">
+            <field name="name">Gửi Email - Hoàn Tất</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="trigger">on_write</field>
+            <field name="sort" eval="4"/>
+            <field name="active">True</field>
+            <field name="filter_domain">[('trang_thai', '=', 'hoan_tat')]</field>
+            <field name="act_mail_to_user">True</field>
+            <field name="email_template_id" ref="email_template_gui_cho_khach"/>
+        </record>
+
+    </data>
+</odoo>

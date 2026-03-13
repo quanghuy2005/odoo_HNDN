@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Mở rộng form view của Nhân Viên -->
+        <record id="view_nhan_vien_form_mo_rong" model="ir.ui.view">
+            <field name="name">hr.employee.form.khach_hang</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='about_employee']" position="after">
+                    <group name="khach_hang" string="Khách Hàng Phụ Trách">
+                        <field name="so_luong_khach_hang" widget="statinfo"/>
+                        <field name="danh_sach_khach_hang" nolabel="1" colspan="2"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

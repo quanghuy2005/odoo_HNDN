@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- MENU CHÍNH -->
+        <menuitem id="menu_tai_lieu_root" name="Quản Lý Tài Liệu" 
+            sequence="100"/>
+
+        <menuitem id="menu_tai_lieu_sub" name="Tài Liệu"
+            parent="menu_tai_lieu_root" sequence="1"/>
+
+        <!-- DANH SÁCH TÀI LIỆU - TREE VIEW -->
+        <record id="view_tai_lieu_tree" model="ir.ui.view">
+            <field name="name">tai_lieu.ke_toa.tree</field>
+            <field name="model">tai_lieu.ke_toa</field>
+            <field name="arch" type="xml">
+                <tree string="Danh Sách Tài Liệu"
+                    decoration-info="trang_thai=='tao_moi'"
+                    decoration-warning="trang_thai=='dang_duyet'"
+                    decoration-success="trang_thai=='da_ky'">
+                    <field name="ma_tai_lieu"/>
+                    <field name="ten_tai_lieu"/>
+                    <field name="loai_tai_lieu"/>
+                    <field name="khach_hang"/>
+                    <field name="trang_thai" widget="badge"/>
+                    <field name="phien_ban"/>
+                    <field name="ngay_tao"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- FORM VIEW - CHI TIẾT TÀI LIỆU -->
+        <record id="view_tai_lieu_form" model="ir.ui.view">
+            <field name="name">tai_lieu.ke_toa.form</field>
+            <field name="model">tai_lieu.ke_toa</field>
+            <field name="arch" type="xml">
+                <form string="Tài Liệu Kế Toán">
+                    <!-- HEADER VỚI NÚT HÀNH ĐỘNG -->
+                    <header>
+                        <button name="hanh_dong_gui_phe_duyet" string="Gửi Phê Duyệt" 
+                            type="object" class="oe_highlight" states="tao_moi"/>
+                        <button name="hanh_dong_yeu_cau_phe_duyet" string="Yêu Cầu Phê Duyệt" 
+                            type="object" class="oe_highlight" states="da_gui"/>
+                        <button name="hanh_dong_phe_duyet" string="Phê Duyệt" 
+                            type="object" class="oe_highlight" states="dang_duyet"/>
+                        <button name="hanh_dong_ky" string="Ký" 
+                            type="object" class="oe_highlight" states="da_phe_duyet"/>
+                        <button name="hanh_dong_hoan_tat" string="Hoàn Tất" 
+                            type="object" states="da_ky"/>
+                        <button name="hanh_dong_tao_phien_ban_moi" string="Tạo Phiên Bản Mới" 
+                            type="object" states="hoan_tat,het_han"/>
+                        <button name="hanh_dong_gui_cho_khach" string="Gửi Cho Khách" 
+                            type="object" class="oe_link" states="da_phe_duyet,da_ky,hoan_tat"/>
+                        <button name="hanh_dong_huy" string="Hủy" 
+                            type="object" class="oe_link"/>
+
+                        <!-- STATUS BAR -->
+                        <field name="trang_thai" widget="statusbar" 
+                            statusbar_visible="tao_moi,da_gui,dang_duyet,da_phe_duyet,da_ky,hoan_tat"/>
+                    </header>
+
+                    <sheet>
+                        <!-- BUTTON BOX - THỐNG KÊ -->
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="action_xem_file">
+                                <field string="File" name="so_luong_file" widget="statinfo"/>
+                            </button>
+                            <button class="oe_stat_button" type="object" name="action_xem_phe_duyet">
+                                <field string="Phê Duyệt" name="so_luong_phe_duyet" widget="statinfo"/>
+                            </button>
+                        </div>
+
+                        <!-- TITLE -->
+                        <div class="oe_title">
+                            <h1>
+                                <field name="ma_tai_lieu" readonly="1"/>
+                                -
+                                <field name="ten_tai_lieu"/>
+                            </h1>
+                        </div>
+
+                        <!-- THÔNG TIN CƠ BẢN -->
+                        <group string="Thông Tin Cơ Bản">
+                            <group>
+                                <field name="loai_tai_lieu"/>
+                                <field name="khach_hang"/>
+                                <field name="nhan_vien_phu_trach"/>
+                            </group>
+                            <group>
+                                <field name="phien_ban" readonly="1"/>
+                                <field name="ngay_tao" readonly="1"/>
+                                <field name="can_phe_duyet"/>
+                            </group>
+                        </group>
+
+                        <!-- MÔ TẢ -->
+                        <group>
+                            <field name="mo_ta" nolabel="1" colspan="2"/>
+                        </group>
+
+                        <!-- NOTEBOOK - CÁC TAB -->
+                        <notebook>
+                            <!-- TAB THỜI GIAN -->
+                            <page string="Thời Gian">
+                                <group>
+                                    <field name="ngay_hieu_luc"/>
+                                    <field name="ngay_het_han"/>
+                                </group>
+                            </page>
+
+                            <!-- TAB PHÊ DUYỆT -->
+                            <page string="Phê Duyệt">
+                                <group>
+                                    <group>
+                                        <field name="phe_duyet_boi" readonly="1"/>
+                                        <field name="ngay_phe_duyet" readonly="1"/>
+                                    </group>
+                                </group>
+                                <field name="danh_sach_phieu_phe_duyet" nolabel="1" colspan="2">
+                                    <tree editable="bottom">
+                                        <field name="nguoi_phe_duyet"/>
+                                        <field name="trang_thai_phieu" widget="badge"/>
+                                        <field name="ngay_phe_duyet"/>
+                                        <field name="y_kien"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                            <!-- TAB KÝ -->
+                            <page string="Ký">
+                                <group>
+                                    <group>
+                                        <field name="da_ky"/>
+                                        <field name="ky_boi" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="ngay_ky" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- TAB FILE -->
+                            <page string="File Đính Kèm">
+                                <field name="danh_sach_file_dinh_kem" nolabel="1" colspan="2">
+                                    <tree editable="bottom">
+                                        <field name="ten_file"/>
+                                        <field name="loai_file"/>
+                                        <field name="kich_thuoc"/>
+                                        <field name="phien_ban_file"/>
+                                        <field name="la_file_chinh"/>
+                                        <field name="ngay_tai_len"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                            <!-- TAB TÌM KIẾM -->
+                            <page string="Tìm Kiếm">
+                                <field name="noi_dung_tim_kiem" nolabel="1" colspan="2"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                    <!-- CHATTER - ACTIVITY & MESSAGES -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- SEARCH VIEW -->
+        <record id="view_tai_lieu_search" model="ir.ui.view">
+            <field name="name">tai_lieu.ke_toa.search</field>
+            <field name="model">tai_lieu.ke_toa</field>
+            <field name="arch" type="xml">
+                <search string="Tìm Kiếm Tài Liệu">
+                    <field name="ma_tai_lieu" string="Mã Tài Liệu"/>
+                    <field name="ten_tai_lieu" string="Tên Tài Liệu"/>
+                    <field name="khach_hang" string="Khách Hàng"/>
+                    <field name="nhan_vien_phu_trach" string="Nhân Viên"/>
+                    <field name="noi_dung_tim_kiem" string="Nội Dung"/>
+                    
+                    <separator/>
+                    
+                    <!-- FILTERS TRẠNG THÁI -->
+                    <filter name="tao_moi" string="Tạo Mới"
+                        domain="[('trang_thai', '=', 'tao_moi')]"/>
+                    <filter name="dang_duyet" string="Đang Phê Duyệt"
+                        domain="[('trang_thai', '=', 'dang_duyet')]"/>
+                    <filter name="da_ky" string="Đã Ký"
+                        domain="[('trang_thai', '=', 'da_ky')]"/>
+                    <filter name="hoan_tat" string="Hoàn Tất"
+                        domain="[('trang_thai', '=', 'hoan_tat')]"/>
+                    
+                    <separator/>
+                    
+                    <!-- FILTERS LOẠI TÀI LIỆU -->
+                    <filter name="hop_dong" string="Hợp Đồng"
+                        domain="[('loai_tai_lieu', '=', 'hop_dong')]"/>
+                    <filter name="bao_gia" string="Báo Giá"
+                        domain="[('loai_tai_lieu', '=', 'bao_gia')]"/>
+                    <filter name="hoa_don" string="Hóa Đơn"
+                        domain="[('loai_tai_lieu', '=', 'hoa_don')]"/>
+                    
+                    <separator/>
+                    
+                    <!-- GROUPING -->
+                    <group expand="0" string="Nhóm Theo">
+                        <filter name="group_trang_thai" string="Trạng Thái"
+                            context="{'group_by': 'trang_thai'}"/>
+                        <filter name="group_khach_hang" string="Khách Hàng"
+                            context="{'group_by': 'khach_hang'}"/>
+                        <filter name="group_loai" string="Loại"
+                            context="{'group_by': 'loai_tai_lieu'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ACTION -->
+        <record id="action_tai_lieu" model="ir.actions.act_window">
+            <field name="name">Tài Liệu</field>
+            <field name="res_model">tai_lieu.ke_toa</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_group_trang_thai': 1}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Bấm để tạo tài liệu mới.</p>
+            </field>
+        </record>
+
+        <!-- MENU ITEM -->
+        <menuitem id="menu_tai_lieu_action" name="Tài Liệu"
+            parent="menu_tai_lieu_sub" action="action_tai_lieu" sequence="1"/>
+
+    </data>
+</odoo>

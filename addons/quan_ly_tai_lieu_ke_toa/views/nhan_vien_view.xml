@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- MỞ RỘNG FORM NHÂN VIÊN - THÊM TAB TÀI LIỆU -->
+        <record id="view_nhan_vien_form_tai_lieu" model="ir.ui.view">
+            <field name="name">hr.employee.form.tai_lieu</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='about_employee']" position="after">
+                    <group name="tai_lieu" string="Tài Liệu Phụ Trách">
+                        <field name="so_tai_lieu" widget="statinfo"/>
+                        <field name="danh_sach_tai_lieu" nolabel="1" colspan="2">
+                            <tree>
+                                <field name="ma_tai_lieu"/>
+                                <field name="ten_tai_lieu"/>
+                                <field name="loai_tai_lieu"/>
+                                <field name="trang_thai" widget="badge"/>
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

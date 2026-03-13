@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tai_lieu_user,Tài Liệu - Người Dùng,model_tai_lieu_ke_toa,base.group_user,1,1,1,0
+access_tai_lieu_manager,Tài Liệu - Quản Lý,model_tai_lieu_ke_toa,base.group_partner_manager,1,1,1,1
+access_phieu_phe_duyet_user,Phiếu Phê Duyệt - Người Dùng,model_phieu_phe_duyet,base.group_user,1,1,1,0
+access_phieu_phe_duyet_manager,Phiếu Phê Duyệt - Quản Lý,model_phieu_phe_duyet,base.group_partner_manager,1,1,1,1
+access_dinh_kem_file_user,File Đính Kèm - Người Dùng,model_dinh_kem_file,base.group_user,1,1,1,0
+access_dinh_kem_file_manager,File Đính Kèm - Quản Lý,model_dinh_kem_file,base.group_partner_manager,1,1,1,1

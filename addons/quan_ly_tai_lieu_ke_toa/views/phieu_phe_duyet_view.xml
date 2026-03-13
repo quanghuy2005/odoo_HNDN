@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- DANH SÁCH PHIẾU PHÊ DUYỆT -->
+        <record id="view_phieu_phe_duyet_tree" model="ir.ui.view">
+            <field name="name">phieu.phe_duyet.tree</field>
+            <field name="model">phieu.phe_duyet</field>
+            <field name="arch" type="xml">
+                <tree string="Phiếu Phê Duyệt">
+                    <field name="tai_lieu"/>
+                    <field name="nguoi_phe_duyet"/>
+                    <field name="trang_thai_phieu" widget="badge"/>
+                    <field name="ngay_tao"/>
+                    <field name="ngay_phe_duyet"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- FORM VIEW PHIẾU PHÊ DUYỆT -->
+        <record id="view_phieu_phe_duyet_form" model="ir.ui.view">
+            <field name="name">phieu.phe_duyet.form</field>
+            <field name="model">phieu.phe_duyet</field>
+            <field name="arch" type="xml">
+                <form string="Phiếu Phê Duyệt">
+                    <header>
+                        <button name="hanh_dong_phê_duyet" string="Phê Duyệt" 
+                            type="object" class="oe_highlight" states="pending"/>
+                        <button name="hanh_dong_tu_choi" string="Từ Chối" 
+                            type="object" states="pending"/>
+                        <button name="hanh_dong_bo_qua" string="Bỏ Qua" 
+                            type="object" states="pending"/>
+                        <field name="trang_thai_phieu" widget="statusbar" 
+                            statusbar_visible="pending,approved,rejected,skipped"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="tai_lieu"/>
+                            <field name="nguoi_phe_duyet"/>
+                            <field name="ngay_tao"/>
+                            <field name="ngay_phe_duyet"/>
+                        </group>
+                        <group>
+                            <field name="y_kien" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- ACTION PHIẾU PHÊ DUYỆT -->
+        <record id="action_phieu_phe_duyet" model="ir.actions.act_window">
+            <field name="name">Phiếu Phê Duyệt</field>
+            <field name="res_model">phieu.phe_duyet</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- MENU PHIẾU PHÊ DUYỆT -->
+        <menuitem id="menu_phieu_phe_duyet" name="Phiếu Phê Duyệt"
+            parent="menu_tai_lieu_sub" action="action_phieu_phe_duyet" sequence="2"/>
+
+    </data>
+</odoo>

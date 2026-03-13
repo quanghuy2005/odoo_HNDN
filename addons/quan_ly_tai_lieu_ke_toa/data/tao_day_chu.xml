@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tạo dãy chữ cho mã tài liệu -->
+        <record id="sequence_tai_lieu" model="ir.sequence">
+            <field name="name">Mã Tài Liệu</field>
+            <field name="code">tai_lieu.sequence</field>
+            <field name="prefix">TD/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+        </record>
+
+    </data>
+</odoo>

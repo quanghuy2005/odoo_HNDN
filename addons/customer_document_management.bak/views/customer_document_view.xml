@@ -3,7 +3,7 @@
     <data>
         <!-- Menu Items -->
         <menuitem id="menu_customer_document_root" name="Document Management" 
-            groups="sales_team.group_sale_user" sequence="100"/>
+            sequence="100"/>
         
         <menuitem id="menu_documents" name="Documents" 
             parent="menu_customer_document_root" sequence="1"/>

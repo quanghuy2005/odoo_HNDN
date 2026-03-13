@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
-                    <page string="Customer Documents" groups="sales_team.group_sale_user">
+                    <page string="Customer Documents">
                         <group>
                             <field name="customer_ids" nolabel="1" colspan="2" widget="many2many_tags"/>
                         </group>

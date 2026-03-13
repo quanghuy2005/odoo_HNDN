@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Menu chính -->
+        <menuitem id="menu_khach_hang_root" name="Quản Lý Khách Hàng"
+            sequence="1"/>
+
+        <!-- Mở rộng form view của Khách Hàng -->
+        <record id="view_khach_hang_form_mo_rong" model="ir.ui.view">
+            <field name="name">res.partner.form.khach_hang_mo_rong</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="contacts.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Thông Tin CRM">
+                        <group>
+                            <group>
+                                <field name="trang_thai_khach_hang" widget="selection"/>
+                                <field name="nguoi_dai_dien"/>
+                                <field name="chuc_vu_dai_dien"/>
+                            </group>
+                            <group>
+                                <field name="so_tien_da_ky"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="tieu_su_giao_dich" nolabel="1" colspan="2"/>
+                        </group>
+                        <group>
+                            <field name="ghi_chu_kinh_doanh" nolabel="1" colspan="2"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Danh sách Khách Hàng -->
+        <record id="view_khach_hang_list" model="ir.ui.view">
+            <field name="name">res.partner.tree.khach_hang</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree string="Danh Sách Khách Hàng">
+                    <field name="name"/>
+                    <field name="trang_thai_khach_hang"/>
+                    <field name="phone"/>
+                    <field name="email"/>
+                    <field name="city"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- View tìm kiếm -->
+        <record id="view_khach_hang_search" model="ir.ui.view">
+            <field name="name">res.partner.search.khach_hang</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <search string="Tìm Kiếm Khách Hàng">
+                    <field name="name" string="Tên Khách Hàng"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <separator/>
+                    <filter name="tiem_nang" string="Tiềm Năng"
+                        domain="[('trang_thai_khach_hang', '=', 'tiem_nang')]"/>
+                    <filter name="dang_giao_dich" string="Đang Giao Dịch"
+                        domain="[('trang_thai_khach_hang', '=', 'dang_giao_dich')]"/>
+                    <filter name="da_ky_hop_dong" string="Đã Ký Hợp Đồng"
+                        domain="[('trang_thai_khach_hang', '=', 'da_ky_hop_dong')]"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action mở Khách Hàng -->
+        <record id="action_khach_hang" model="ir.actions.act_window">
+            <field name="name">Khách Hàng</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_khach_hang_list"/>
+            <field name="search_view_id" ref="view_khach_hang_search"/>
+            <field name="domain">[('is_company', '=', False)]</field>
+        </record>
+
+        <!-- Menu chính trang web -->
+        <menuitem id="menu_khach_hang_danh_sach" name="Danh Sách Khách Hàng"
+            parent="menu_khach_hang_root" action="action_khach_hang" sequence="1"/>
+
+    </data>
+</odoo>

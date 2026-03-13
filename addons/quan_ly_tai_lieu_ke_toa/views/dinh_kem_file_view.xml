@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- DANH SÁCH FILE ĐÍNH KÈM -->
+        <record id="view_dinh_kem_file_tree" model="ir.ui.view">
+            <field name="name">dinh_kem.file.tree</field>
+            <field name="model">dinh_kem.file</field>
+            <field name="arch" type="xml">
+                <tree string="File Đính Kèm">
+                    <field name="tai_lieu"/>
+                    <field name="ten_file"/>
+                    <field name="loai_file"/>
+                    <field name="kich_thuoc"/>
+                    <field name="phien_ban_file"/>
+                    <field name="ngay_tai_len"/>
+                    <field name="tai_len_boi"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- FORM VIEW FILE ĐÍNH KÈM -->
+        <record id="view_dinh_kem_file_form" model="ir.ui.view">
+            <field name="name">dinh_kem.file.form</field>
+            <field name="model">dinh_kem.file</field>
+            <field name="arch" type="xml">
+                <form string="File Đính Kèm">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="tai_lieu"/>
+                                <field name="ten_file"/>
+                                <field name="loai_file" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="phien_ban_file"/>
+                                <field name="la_file_chinh"/>
+                                <field name="kich_thuoc" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="mo_ta" nolabel="1" colspan="2"/>
+                        </group>
+                        <group>
+                            <field name="file_noi_dung" widget="binary" nolabel="1" colspan="2"/>
+                        </group>
+                        <group>
+                            <field name="ngay_tai_len" readonly="1"/>
+                            <field name="tai_len_boi" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- ACTION FILE ĐÍNH KÈM -->
+        <record id="action_dinh_kem_file" model="ir.actions.act_window">
+            <field name="name">File Đính Kèm</field>
+            <field name="res_model">dinh_kem.file</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- MENU FILE ĐÍNH KÈM -->
+        <menuitem id="menu_dinh_kem_file" name="File Đính Kèm"
+            parent="menu_tai_lieu_sub" action="action_dinh_kem_file" sequence="3"/>
+
+    </data>
+</odoo>

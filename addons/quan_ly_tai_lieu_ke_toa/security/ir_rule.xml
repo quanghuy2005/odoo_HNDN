@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- RULE 1: Người dùng chỉ xem tài liệu của khách hàng phụ trách -->
+        <record id="rule_tai_lieu_khach_hang" model="ir.rule">
+            <field name="name">Tài Liệu - Khách Hàng Phụ Trách</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="domain_force">
+                [
+                    '|',
+                    ('nhan_vien_phu_trach.danh_sach_khach_hang', 'in', [self.env.user.employee_ids.danh_sach_khach_hang.ids]),
+                    ('nhan_vien_phu_trach', '=', self.env.user.employee_ids.ids)
+                ]
+            </field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- RULE 2: Sales Manager xem tất cả -->
+        <record id="rule_tai_lieu_manager" model="ir.rule">
+            <field name="name">Tài Liệu - Quản Lý Xem Tất Cả</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">True</field>
+            <field name="perm_create">True</field>
+            <field name="perm_unlink">True</field>
+            <field name="groups" eval="[(4, ref('base.group_partner_manager'))]"/>
+        </record>
+
+        <!-- RULE 3: HR Manager full access -->
+        <record id="rule_tai_lieu_hr_manager" model="ir.rule">
+            <field name="name">Tài Liệu - HR Manager Full Access</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">True</field>
+            <field name="perm_create">True</field>
+            <field name="perm_unlink">True</field>
+            <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+        </record>
+
+        <!-- RULE 4: Phiếu Phê Duyệt - Người dùng chỉ xem phiếu của tài liệu họ có quyền xem -->
+        <record id="rule_phieu_phe_duyet" model="ir.rule">
+            <field name="name">Phiếu Phê Duyệt - Quyền Xem Tương Ứng</field>
+            <field name="model_id" ref="model_phieu_phe_duyet"/>
+            <field name="domain_force">
+                [
+                    ('tai_lieu', 'in', self.env['tai_lieu.ke_toa'].search([]).ids)
+                ]
+            </field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- RULE 5: File Đính Kèm - Tương tự tài liệu -->
+        <record id="rule_dinh_kem_file" model="ir.rule">
+            <field name="name">File Đính Kèm - Quyền Xem Tương Ứng</field>
+            <field name="model_id" ref="model_dinh_kem_file"/>
+            <field name="domain_force">
+                [
+                    ('tai_lieu', 'in', self.env['tai_lieu.ke_toa'].search([]).ids)
+                ]
+            </field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+    </data>
+</odoo>
