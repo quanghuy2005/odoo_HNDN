@@ -7,15 +7,22 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='about_employee']" position="after">
+                <xpath expr="//page[@name='public']" position="inside">
+                    <group name="kpi_thong_ke" string="Chỉ Tiêu KPI Đạt Được (Cá Nhân)">
+                        <group>
+                            <field name="so_hop_dong_chot" string="Số Hợp Đồng Đã Chốt" widget="statinfo"/>
+                            <field name="tong_doanh_thu_mang_ve" string="Tổng Doanh Thu Mang Về (VNĐ)" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
                     <group name="tai_lieu" string="Tài Liệu Phụ Trách">
-                        <field name="so_tai_lieu" widget="statinfo"/>
+                        <field name="so_tai_lieu" widget="statinfo" string="Tổng Số Tài Liệu Đang Xử Lý"/>
                         <field name="danh_sach_tai_lieu" nolabel="1" colspan="2">
                             <tree>
                                 <field name="ma_tai_lieu"/>
                                 <field name="ten_tai_lieu"/>
                                 <field name="loai_tai_lieu"/>
                                 <field name="trang_thai" widget="badge"/>
+                                <field name="gia_tri_tai_lieu"/>
                             </tree>
                         </field>
                     </group>

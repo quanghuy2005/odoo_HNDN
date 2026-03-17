@@ -4,14 +4,14 @@
         <!-- EMAIL TEMPLATE 1: Thông báo gửi phê duyệt -->
         <record id="email_template_yeu_cau_phe_duyet" model="mail.template">
             <field name="name">Tài Liệu - Yêu Cầu Phê Duyệt</field>
-            <field name="email_from">${user.email_formatted}</field>
-            <field name="email_to">${object.phe_duyet_boi.email}</field>
-            <field name="subject">Yêu Cầu Phê Duyệt Tài Liệu: ${object.ma_tai_lieu}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.phe_duyet_boi.email }}</field>
+            <field name="subject">Yêu Cầu Phê Duyệt Tài Liệu: {{ object.ma_tai_lieu }}</field>
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="body_html" type="html">
                 <div style="font-family:Verdana,Arial,Helvetica,sans-serif; font-size:13px">
                     <p>Xin chào,</p>
-                    <p>Tài liệu <strong>${object.ten_tai_lieu}</strong> (${object.ma_tai_lieu}) cần sự phê duyệt của bạn.</p>
+                    <p>Tài liệu <strong><t t-out="object.ten_tai_lieu"/></strong> (<t t-out="object.ma_tai_lieu"/>) cần sự phê duyệt của bạn.</p>
                     <table style="width:100%; border-collapse:collapse; border:1px solid #ddd;">
                         <tr style="background-color:#f2f2f2;">
                             <th style="padding:10px; text-align:left;">Thông Tin</th>
@@ -19,27 +19,27 @@
                         </tr>
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">Mã Tài Liệu</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${object.ma_tai_lieu}</td>
+                            <td style="padding:10px; border:1px solid #ddd;"><t t-out="object.ma_tai_lieu"/></td>
                         </tr>
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">Tên Tài Liệu</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${object.ten_tai_lieu}</td>
+                            <td style="padding:10px; border:1px solid #ddd;"><t t-out="object.ten_tai_lieu"/></td>
                         </tr>
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">Loại</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${object.loai_tai_lieu}</td>
+                            <td style="padding:10px; border:1px solid #ddd;"><t t-out="object.loai_tai_lieu"/></td>
                         </tr>
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">Khách Hàng</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${object.khach_hang.name}</td>
+                            <td style="padding:10px; border:1px solid #ddd;"><t t-out="object.khach_hang.name"/></td>
                         </tr>
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">Ngày Tạo</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${object.ngay_tao}</td>
+                            <td style="padding:10px; border:1px solid #ddd;"><t t-out="object.ngay_tao"/></td>
                         </tr>
                     </table>
                     <p style="margin-top:20px;">
-                        <a href="/web/content/${object._name}/${object.id}" style="background-color:#0066cc; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+                        <a t-attf-href="/web/content/{{object._name}}/{{object.id}}" style="background-color:#0066cc; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
                             Xem Tài Liệu
                         </a>
                     </p>
@@ -53,13 +53,13 @@
         <!-- EMAIL TEMPLATE 2: Thông báo đã phê duyệt -->
         <record id="email_template_da_phe_duyet" model="mail.template">
             <field name="name">Tài Liệu - Đã Phê Duyệt</field>
-            <field name="email_from">${user.email_formatted}</field>
-            <field name="subject">Tài Liệu Đã Phê Duyệt: ${object.ma_tai_lieu}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="subject">Tài Liệu Đã Phê Duyệt: {{ object.ma_tai_lieu }}</field>
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="body_html" type="html">
                 <div style="font-family:Verdana,Arial,Helvetica,sans-serif; font-size:13px">
                     <p>Xin chào,</p>
-                    <p>Tài liệu <strong>${object.ten_tai_lieu}</strong> (${object.ma_tai_lieu}) đã được phê duyệt bởi <strong>${object.phe_duyet_boi.name}</strong>.</p>
+                    <p>Tài liệu <strong><t t-out="object.ten_tai_lieu"/></strong> (<t t-out="object.ma_tai_lieu"/>) đã được phê duyệt bởi <strong><t t-out="object.phe_duyet_boi.name"/></strong>.</p>
                     <p>Bạn có thể tiếp tục với bước tiếp theo: <strong>Ký Tài Liệu</strong></p>
                     <p style="margin-top:20px; color:#27ae60;">
                         ✓ Trạng Thái: <strong>Đã Phê Duyệt</strong>
@@ -73,13 +73,13 @@
         <!-- EMAIL TEMPLATE 3: Thông báo đã ký -->
         <record id="email_template_da_ky" model="mail.template">
             <field name="name">Tài Liệu - Đã Ký</field>
-            <field name="email_from">${user.email_formatted}</field>
-            <field name="subject">Tài Liệu Đã Ký: ${object.ma_tai_lieu}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="subject">Tài Liệu Đã Ký: {{ object.ma_tai_lieu }}</field>
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="body_html" type="html">
                 <div style="font-family:Verdana,Arial,Helvetica,sans-serif; font-size:13px">
                     <p>Xin chào,</p>
-                    <p>Tài liệu <strong>${object.ten_tai_lieu}</strong> (${object.ma_tai_lieu}) đã được ký bởi <strong>${object.ky_boi.name}</strong> vào lúc <strong>${object.ngay_ky}</strong>.</p>
+                    <p>Tài liệu <strong><t t-out="object.ten_tai_lieu"/></strong> (<t t-out="object.ma_tai_lieu"/>) đã được ký bởi <strong><t t-out="object.ky_boi.name"/></strong> vào lúc <strong><t t-out="object.ngay_ky"/></strong>.</p>
                     <p>Bạn có thể hoàn tất tài liệu hoặc gửi cho khách hàng.</p>
                     <p style="margin-top:20px; color:#27ae60;">
                         ✓ Trạng Thái: <strong>Đã Ký</strong>
@@ -93,34 +93,34 @@
         <!-- EMAIL TEMPLATE 4: Thông báo gửi cho khách hàng -->
         <record id="email_template_gui_cho_khach" model="mail.template">
             <field name="name">Tài Liệu - Gửi Cho Khách Hàng</field>
-            <field name="email_from">${user.email_formatted}</field>
-            <field name="email_to">${object.khach_hang.email}</field>
-            <field name="subject">Tài Liệu Của Bạn: ${object.ten_tai_lieu}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.khach_hang.email }}</field>
+            <field name="subject">Tài Liệu Của Bạn: {{ object.ten_tai_lieu }}</field>
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="body_html" type="html">
                 <div style="font-family:Verdana,Arial,Helvetica,sans-serif; font-size:13px">
-                    <p>Xin chào <strong>${object.khach_hang.name}</strong>,</p>
-                    <p>Chúng tôi gửi tài liệu <strong>${object.ten_tai_lieu}</strong> cho bạn.</p>
+                    <p>Xin chào <strong><t t-out="object.khach_hang.name"/></strong>,</p>
+                    <p>Chúng tôi gửi tài liệu <strong><t t-out="object.ten_tai_lieu"/></strong> cho bạn.</p>
                     <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; margin:20px 0;">
                         <tr style="background-color:#f2f2f2;">
                             <th style="padding:10px; text-align:left;">Chi Tiết</th>
                         </tr>
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">
-                                <strong>Loại Tài Liệu:</strong> ${object.loai_tai_lieu}<br/>
-                                <strong>Ngày Tạo:</strong> ${object.ngay_tao}<br/>
-                                <strong>Ngày Hiệu Lực:</strong> ${object.ngay_hieu_luc}<br/>
-                                <strong>Ngày Hết Hạn:</strong> ${object.ngay_het_han}
+                                <strong>Loại Tài Liệu:</strong> <t t-out="object.loai_tai_lieu"/><br/>
+                                <strong>Ngày Tạo:</strong> <t t-out="object.ngay_tao"/><br/>
+                                <strong>Ngày Hiệu Lực:</strong> <t t-out="object.ngay_hieu_luc"/><br/>
+                                <strong>Ngày Hết Hạn:</strong> <t t-out="object.ngay_het_han"/>
                             </td>
                         </tr>
                     </table>
                     <p style="margin-top:20px;">
-                        <a href="/web/login" style="background-color:#0066cc; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+                        <a t-attf-href="{{ object.get_base_url() }}/mail/view?model={{ object._name }}&amp;res_id={{ object.id }}" style="background-color:#0066cc; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
                             Xem Tài Liệu Trực Tuyến
                         </a>
                     </p>
                     <p>Vui lòng xem xét và ký tên nếu cần thiết.</p>
-                    <p>Nếu bạn có bất kỳ câu hỏi, vui lòng liên hệ với <strong>${object.nhan_vien_phu_trach.name}</strong>.</p>
+                    <p>Nếu bạn có bất kỳ câu hỏi, vui lòng liên hệ với <strong><t t-out="object.nhan_vien_phu_trach.name"/></strong>.</p>
                     <p>Trân trọng,<br/>Công Ty</p>
                 </div>
             </field>
@@ -130,17 +130,17 @@
         <!-- EMAIL TEMPLATE 5: Thông báo hoàn tất -->
         <record id="email_template_hoan_tat" model="mail.template">
             <field name="name">Tài Liệu - Hoàn Tất</field>
-            <field name="email_from">${user.email_formatted}</field>
-            <field name="subject">Tài Liệu Hoàn Tất: ${object.ma_tai_lieu}</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="subject">Tài Liệu Hoàn Tất: {{ object.ma_tai_lieu }}</field>
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="body_html" type="html">
                 <div style="font-family:Verdana,Arial,Helvetica,sans-serif; font-size:13px">
                     <p>Xin chào,</p>
-                    <p>Tài liệu <strong>${object.ten_tai_lieu}</strong> (${object.ma_tai_lieu}) đã được hoàn tất thành công.</p>
+                    <p>Tài liệu <strong><t t-out="object.ten_tai_lieu"/></strong> (<t t-out="object.ma_tai_lieu"/>) đã được hoàn tất thành công.</p>
                     <p style="margin-top:20px; color:#27ae60;">
                         ✓ Quy Trình: <strong>100% Hoàn Tất</strong><br/>
                         ✓ Trạng Thái: <strong>Hoàn Tất</strong><br/>
-                        ✓ Khách Hàng: <strong>${object.khach_hang.name}</strong>
+                        ✓ Khách Hàng: <strong><t t-out="object.khach_hang.name"/></strong>
                     </p>
                     <p>Tài liệu được lưu trữ an toàn trong hệ thống của chúng tôi.</p>
                     <p>Trân trọng,<br/>Hệ thống Quản Lý Tài Liệu</p>

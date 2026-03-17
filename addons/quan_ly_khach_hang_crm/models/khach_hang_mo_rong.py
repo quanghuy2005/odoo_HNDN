@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class KhachHangMoRong(models.Model):
@@ -17,7 +17,7 @@ class KhachHangMoRong(models.Model):
 
     # Thông tin thêm
     tieu_su_giao_dich = fields.Text(
-        string='Lịch Sử Giao Dịch',
+        string='Lịch Sự Giao Dịch',
         help='Ghi chú về những giao dịch trước đó'
     )
     
@@ -41,12 +41,64 @@ class KhachHangMoRong(models.Model):
     so_tien_da_ky = fields.Float(
         string='Tổng Giá Trị Hợp Đồng (VND)',
         compute='_tinh_tong_gia_tri',
-        store=True,
         help='Tổng giá trị tất cả hợp đồng đã ký'
     )
 
+    so_luong_tai_lieu = fields.Integer(
+        string='Số Hợp Đồng',
+        compute='_tinh_so_luong_tai_lieu'
+    )
+    
+    so_luong_van_ban = fields.Integer(
+        string='Hồ Sơ Văn Bản',
+        compute='_tinh_so_luong_van_ban'
+    )
+
     def _tinh_tong_gia_tri(self):
-        """Tính tổng giá trị các hợp đồng (nếu module tài liệu được cài)"""
         for khach in self:
-            khach.so_tien_da_ky = 0.0
-            # Sẽ được tính toán khi module tài liệu được cài
+            tong_tien = 0.0
+            if 'tai_lieu.ke_toa' in self.env:
+                tai_lieus = self.env['tai_lieu.ke_toa'].search([
+                    ('khach_hang', '=', khach.id),
+                    ('trang_thai', 'in', ['da_ky', 'hoan_tat'])
+                ])
+                tong_tien = sum(tai_lieus.mapped('gia_tri_tai_lieu'))
+            khach.so_tien_da_ky = tong_tien
+            
+    def _tinh_so_luong_tai_lieu(self):
+        for khach in self:
+            if 'tai_lieu.ke_toa' in self.env:
+                khach.so_luong_tai_lieu = self.env['tai_lieu.ke_toa'].search_count([('khach_hang', '=', khach.id)])
+            else:
+                khach.so_luong_tai_lieu = 0
+            
+    def action_xem_tai_lieu(self):
+        """Hành động mở danh sách tài liệu khi bấm vào nút thông minh"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Hợp Đồng Kế Toán',
+            'res_model': 'tai_lieu.ke_toa',
+            'view_mode': 'tree,form',
+            'domain': [('khach_hang', '=', self.id)],
+            'context': {'default_khach_hang': self.id},
+        }
+
+    def _tinh_so_luong_van_ban(self):
+        for khach in self:
+            if 'ho_so_van_ban' in self.env:
+                khach.so_luong_van_ban = self.env['ho_so_van_ban'].search_count([('khach_hang_id', '=', khach.id)])
+            else:
+                khach.so_luong_van_ban = 0
+                
+    def action_xem_van_ban(self):
+        """Hành động mở kho văn bản hành chính khi bấm vào nút thông minh"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Hồ Sơ Hành Chính',
+            'res_model': 'ho_so_van_ban',
+            'view_mode': 'tree,form',
+            'domain': [('khach_hang_id', '=', self.id)],
+            'context': {'default_khach_hang_id': self.id},
+        }

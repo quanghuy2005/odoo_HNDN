@@ -24,11 +24,11 @@
                 <form string="Phiếu Phê Duyệt">
                     <header>
                         <button name="hanh_dong_phê_duyet" string="Phê Duyệt" 
-                            type="object" class="oe_highlight" states="pending"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai_phieu', '!=', 'pending')]}"/>
                         <button name="hanh_dong_tu_choi" string="Từ Chối" 
-                            type="object" states="pending"/>
+                            type="object" attrs="{'invisible': [('trang_thai_phieu', '!=', 'pending')]}"/>
                         <button name="hanh_dong_bo_qua" string="Bỏ Qua" 
-                            type="object" states="pending"/>
+                            type="object" attrs="{'invisible': [('trang_thai_phieu', '!=', 'pending')]}"/>
                         <field name="trang_thai_phieu" widget="statusbar" 
                             statusbar_visible="pending,approved,rejected,skipped"/>
                     </header>

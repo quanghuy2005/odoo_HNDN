@@ -8,13 +8,13 @@
             <field name="domain_force">
                 [
                     '|',
-                    ('nhan_vien_phu_trach.danh_sach_khach_hang', 'in', [self.env.user.employee_ids.danh_sach_khach_hang.ids]),
-                    ('nhan_vien_phu_trach', '=', self.env.user.employee_ids.ids)
+                    ('nhan_vien_phu_trach.danh_sach_khach_hang', 'in', user.employee_ids.danh_sach_khach_hang.ids),
+                    ('nhan_vien_phu_trach', 'in', user.employee_ids.ids)
                 ]
             </field>
             <field name="perm_read">True</field>
-            <field name="perm_write">False</field>
-            <field name="perm_create">False</field>
+            <field name="perm_write">True</field>
+            <field name="perm_create">True</field>
             <field name="perm_unlink">False</field>
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         </record>
@@ -49,12 +49,14 @@
             <field name="model_id" ref="model_phieu_phe_duyet"/>
             <field name="domain_force">
                 [
-                    ('tai_lieu', 'in', self.env['tai_lieu.ke_toa'].search([]).ids)
+                    '|',
+                    ('tai_lieu.nhan_vien_phu_trach.danh_sach_khach_hang', 'in', user.employee_ids.danh_sach_khach_hang.ids),
+                    ('tai_lieu.nhan_vien_phu_trach', 'in', user.employee_ids.ids)
                 ]
             </field>
             <field name="perm_read">True</field>
-            <field name="perm_write">False</field>
-            <field name="perm_create">False</field>
+            <field name="perm_write">True</field>
+            <field name="perm_create">True</field>
             <field name="perm_unlink">False</field>
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         </record>
@@ -65,13 +67,15 @@
             <field name="model_id" ref="model_dinh_kem_file"/>
             <field name="domain_force">
                 [
-                    ('tai_lieu', 'in', self.env['tai_lieu.ke_toa'].search([]).ids)
+                    '|',
+                    ('tai_lieu.nhan_vien_phu_trach.danh_sach_khach_hang', 'in', user.employee_ids.danh_sach_khach_hang.ids),
+                    ('tai_lieu.nhan_vien_phu_trach', 'in', user.employee_ids.ids)
                 ]
             </field>
             <field name="perm_read">True</field>
-            <field name="perm_write">False</field>
-            <field name="perm_create">False</field>
-            <field name="perm_unlink">False</field>
+            <field name="perm_write">True</field>
+            <field name="perm_create">True</field>
+            <field name="perm_unlink">True</field>
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         </record>
 

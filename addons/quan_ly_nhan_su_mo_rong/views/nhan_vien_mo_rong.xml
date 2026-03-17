@@ -7,11 +7,28 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='about_employee']" position="after">
+                <xpath expr="//page[@name='public']" position="inside">
                     <group name="khach_hang" string="Khách Hàng Phụ Trách">
                         <field name="so_luong_khach_hang" widget="statinfo"/>
                         <field name="danh_sach_khach_hang" nolabel="1" colspan="2"/>
                     </group>
+                </xpath>
+
+                <!-- Thay vì tìm label for='work_email' (dễ sinh lỗi nếu bản Odoo khác text), ta tìm trực tiếp field tương ứng để thay label hoặc đơn giản bỏ phần Việt hóa lắt nhắt này đi để system tự dùng i18n -->
+                <xpath expr="//field[@name='work_email']" position="attributes">
+                    <attribute name="string">Email Công Việc</attribute>
+                </xpath>
+                <xpath expr="//field[@name='work_phone']" position="attributes">
+                    <attribute name="string">Số Điện Thoại Cơ Quan</attribute>
+                </xpath>
+                <xpath expr="//field[@name='department_id']" position="attributes">
+                    <attribute name="string">Phòng Ban</attribute>
+                </xpath>
+                <xpath expr="//field[@name='parent_id']" position="attributes">
+                    <attribute name="string">Quản Lý Trực Tiếp</attribute>
+                </xpath>
+                <xpath expr="//field[@name='coach_id']" position="attributes">
+                    <attribute name="string">Huấn Luyện Viên</attribute>
                 </xpath>
             </field>
         </record>

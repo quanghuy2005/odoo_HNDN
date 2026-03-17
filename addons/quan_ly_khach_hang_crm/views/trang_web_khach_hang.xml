@@ -9,9 +9,24 @@
         <record id="view_khach_hang_form_mo_rong" model="ir.ui.view">
             <field name="name">res.partner.form.khach_hang_mo_rong</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="contacts.view_partner_form"/>
+            <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//notebook" position="inside">
+                <xpath expr="//sheet" position="before">
+                    <header>
+                        <!-- Thêm header nếu cần sau này -->
+                    </header>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_xem_tai_lieu"
+                        icon="fa-usd">
+                        <field string="Hợp Đồng" name="so_luong_tai_lieu" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button" type="object" name="action_xem_van_ban"
+                        icon="fa-folder-open">
+                        <field string="Hồ Sơ Số" name="so_luong_van_ban" widget="statinfo"/>
+                    </button>
+                </xpath>
+                <xpath expr="//page[@name='contact_addresses']" position="after">
                     <page string="Thông Tin CRM">
                         <group>
                             <group>

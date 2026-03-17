@@ -1,10 +1,20 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+import base64
+import io
+
+try:
+    import PyPDF2
+    PYPDF2_AVAILABLE = True
+except ImportError:
+    PYPDF2_AVAILABLE = False
 
 
 class DinhKemFile(models.Model):
     """Model lưu trữ file đính kèm"""
     _name = 'dinh_kem.file'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'File Đính Kèm'
     _rec_name = 'ten_file'
 
@@ -82,7 +92,7 @@ class DinhKemFile(models.Model):
     def _tinh_loai_file(self):
         """Xác định loại file từ tên"""
         for dkf in self:
-            if '.' in dkf.ten_file:
+            if dkf.ten_file and '.' in dkf.ten_file:
                 dkf.loai_file = dkf.ten_file.split('.')[-1].upper()
             else:
                 dkf.loai_file = 'Unknown'
@@ -104,3 +114,63 @@ class DinhKemFile(models.Model):
             'url': f'/web/content/{self._name}/{self.id}/file_noi_dung/{self.ten_file}',
             'target': 'self',
         }
+
+    def hanh_dong_tom_tat_ai(self):
+        """Hành động đọc text từ PDF và nhờ AI tóm tắt"""
+        self.ensure_one()
+        if not self.file_noi_dung:
+            raise UserError('File đính kèm bị rỗng!')
+            
+        if self.loai_file != 'PDF':
+            raise UserError('Hiện tại hệ thống chỉ hỗ trợ AI tóm tắt cho định dạng PDF.')
+            
+        if not PYPDF2_AVAILABLE:
+            raise UserError('Cần cài đặt thư viện PyPDF2: pip install PyPDF2')
+
+        # 1. Tìm cấu hình AI đang bật
+        ai_config = self.env['ai.configuration'].search([('bat_tom_tat', '=', True)], limit=1)
+        if not ai_config:
+            raise UserError('Chưa bật Cấu hình AI nào trong hệ thống.')
+
+        # 2. Đọc file base64 và extract text từ PDF
+        try:
+            file_data = base64.b64decode(self.file_noi_dung)
+            pdf_file = io.BytesIO(file_data)
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
+            
+            extracted_text = ""
+            for i, page in enumerate(pdf_reader.pages):
+                # Chỉ lấy 5 trang đầu để tiết kiệm token
+                if i >= 5: 
+                    break
+                text = page.extract_text()
+                if text:
+                    extracted_text += text + "\n"
+                    
+            if not extracted_text.strip():
+                raise UserError('Không thể trích xuất văn bản từ PDF (Có thể PDF là file ảnh scan).')
+                
+        except Exception as e:
+            raise UserError(f'Lỗi khi đọc file PDF: {str(e)}')
+
+        # 3. Gửi lên AI
+        summary_result = ai_config.tom_tat_noi_dung(extracted_text)
+        
+        if summary_result:
+            # Lưu log vào Chatter của tài liệu cha
+            log_body = f"<p>🤖 <b>AI Tóm tắt file {self.ten_file}:</b></p><p>{summary_result.replace(chr(10), '<br/>')}</p>"
+            self.tai_lieu.message_post(body=log_body)
+            # Cập nhật ô mô tả của file đính kèm để dễ xem
+            self.write({'mo_ta': f"AI SUMMARIZED:\n{summary_result}"})
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'AI Hoàn Tất',
+                    'message': 'Đã tóm tắt thành công! Xem kết quả ở Mô tả file hoặc trong mục thảo luận của Tài Liệu.',
+                    'type': 'success',
+                }
+            }
+        else:
+            raise UserError('AI phản hồi rỗng. Vui lòng kiểm tra lại cấu hình API Key.')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class NhanVienMoRong(models.Model):
@@ -23,6 +23,7 @@ class NhanVienMoRong(models.Model):
         store=True
     )
 
+    @api.depends('danh_sach_khach_hang')
     def _tinh_so_luong_khach_hang(self):
         """Tính số lượng khách hàng mà nhân viên phụ trách"""
         for nv in self:

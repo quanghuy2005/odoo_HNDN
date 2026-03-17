@@ -8,7 +8,30 @@
 
 
 
-# 1. Cài đặt công cụ, môi trường và các thư viện cần thiết
+# 1. Các tính năng Nổi Bật của Dự án (Kế toán, CRM, Nhân sự)
+
+### 1.1 Quản lý Tài Liệu & Kế Toán (quan_ly_tai_lieu_ke_toa)
+- Quản lý vòng đời tài liệu: Hợp đồng, Báo giá, Hóa đơn,... với 7 trạng thái chuẩn.
+- Gửi yêu cầu phê duyệt và theo dõi lịch sử phê duyệt.
+- Quản lý file đính kèm với nhiều phiên bản (hỗ trợ hiển thị và tải xuống).
+- **[NEW] Đọc và trích xuất dữ liệu từ PDF.** 
+- **[NEW] Tích hợp AI (Claude/ChatGPT) tóm tắt nhanh nội dung Hợp đồng.**
+- **[NEW] Tích hợp tự động Backup Hợp Đồng/Tài liệu lên Google Drive ngay khi hoàn tất.**
+- Tự động sinh `Hóa Đơn Nháp` (Draft Invoice) trên phân hệ Kế Toán `account.move` khi Hợp đồng chuyển sang `Hoàn Tất`.
+- Chạy nền cảnh báo tự động các Hợp đồng sắp hết hạn trong vòng 7 ngày.
+
+### 1.2 Quản lý Khách Hàng (quan_ly_khach_hang_crm - Kế thừa Khách hàng chuẩn)
+- Lưu trữ Tình trạng khách hàng, Ghi chú kinh doanh, Vai trò người đại diện.
+- Form hiển thị trực quan toàn bộ `Tài Liệu Của Khách` theo danh sách thông minh (Smart Button).
+- Tính tổng tiền các Hợp đồng đã chốt thành công.
+- Tích hợp tính năng biến CRM Lead (Cơ hội khách hàng tiềm năng) tự động sang một Draft Hợp Đồng.
+
+### 1.3 Quản lý Nhân Sự (quan_ly_nhan_su_mo_rong - Kế thừa Personnel)
+- Mở rộng model `hr.employee`, 1 nhân viên quản lý dải danh sách Khách hàng đa dạng.
+- **Tự Động Giao Việc:** Khi admin thực hiện "Lưu trữ" (Archive / Nghỉ việc) một Nhân Sự, hệ thống quét auto toàn bộ Hợp Đồng chưa Ký của họ và tự nhận diện `Manager` chuyển giao hồ sơ. Không bao giờ gãy vụn dữ liệu.
+- **[NEW] Hệ thống Báo Cáo KPI (Dashboard Cá nhân):** Tính tự động "Tổng Số Hợp đồng chốt được" và "Tổng Doanh Thu mang về" ghim luôn lên form nhân viên.
+
+# 2. Cài đặt công cụ, môi trường và các thư viện cần thiết
 
 ## 1.1. Clone project.
 ```

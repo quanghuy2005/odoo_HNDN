@@ -37,19 +37,19 @@
                     <!-- HEADER VỚI NÚT HÀNH ĐỘNG -->
                     <header>
                         <button name="hanh_dong_gui_phe_duyet" string="Gửi Phê Duyệt" 
-                            type="object" class="oe_highlight" states="tao_moi"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'tao_moi')]}"/>
                         <button name="hanh_dong_yeu_cau_phe_duyet" string="Yêu Cầu Phê Duyệt" 
-                            type="object" class="oe_highlight" states="da_gui"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'da_gui')]}"/>
                         <button name="hanh_dong_phe_duyet" string="Phê Duyệt" 
-                            type="object" class="oe_highlight" states="dang_duyet"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'dang_duyet')]}"/>
                         <button name="hanh_dong_ky" string="Ký" 
-                            type="object" class="oe_highlight" states="da_phe_duyet"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'da_phe_duyet')]}"/>
                         <button name="hanh_dong_hoan_tat" string="Hoàn Tất" 
-                            type="object" states="da_ky"/>
+                            type="object" attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"/>
                         <button name="hanh_dong_tao_phien_ban_moi" string="Tạo Phiên Bản Mới" 
-                            type="object" states="hoan_tat,het_han"/>
+                            type="object" attrs="{'invisible': [('trang_thai', 'not in', ['hoan_tat', 'het_han'])]}"/>
                         <button name="hanh_dong_gui_cho_khach" string="Gửi Cho Khách" 
-                            type="object" class="oe_link" states="da_phe_duyet,da_ky,hoan_tat"/>
+                            type="object" class="oe_link" attrs="{'invisible': [('trang_thai', 'not in', ['da_phe_duyet', 'da_ky', 'hoan_tat'])]}"/>
                         <button name="hanh_dong_huy" string="Hủy" 
                             type="object" class="oe_link"/>
 
@@ -141,14 +141,32 @@
                             <!-- TAB FILE -->
                             <page string="File Đính Kèm">
                                 <field name="danh_sach_file_dinh_kem" nolabel="1" colspan="2">
-                                    <tree editable="bottom">
+                                    <tree>
                                         <field name="ten_file"/>
                                         <field name="loai_file"/>
-                                        <field name="kich_thuoc"/>
+                                        <field name="kich_thuoc" string="Kích Thước (KB)"/>
                                         <field name="phien_ban_file"/>
                                         <field name="la_file_chinh"/>
                                         <field name="ngay_tai_len"/>
+                                        <button name="hanh_dong_download" string="Tải Xuống" type="object" icon="fa-download"/>
+                                        <button name="hanh_dong_tom_tat_ai" string="AI Tóm Tắt" type="object" icon="fa-magic" class="oe_highlight"/>
                                     </tree>
+                                    <form>
+                                        <group>
+                                            <field name="file_noi_dung" widget="binary" filename="ten_file" string="Chọn File"/>
+                                            <field name="ten_file" string="Tên File"/>
+                                        </group>
+                                        <group>
+                                            <field name="phien_ban_file"/>
+                                            <field name="la_file_chinh"/>
+                                            <field name="mo_ta"/>
+                                        </group>
+                                        <group>
+                                            <field name="loai_file" readonly="1"/>
+                                            <field name="kich_thuoc" readonly="1"/>
+                                            <field name="ngay_tai_len" readonly="1"/>
+                                        </group>
+                                    </form>
                                 </field>
                             </page>
 
@@ -213,8 +231,36 @@
                             context="{'group_by': 'khach_hang'}"/>
                         <filter name="group_loai" string="Loại"
                             context="{'group_by': 'loai_tai_lieu'}"/>
+                        <filter name="group_nhan_vien" string="Nhân Viên"
+                            context="{'group_by': 'nhan_vien_phu_trach'}"/>
                     </group>
                 </search>
+            </field>
+        </record>
+
+        <!-- GRAPH VIEW - DASHBOARD -->
+        <record id="view_tai_lieu_graph" model="ir.ui.view">
+            <field name="name">tai_lieu.ke_toa.graph</field>
+            <field name="model">tai_lieu.ke_toa</field>
+            <field name="arch" type="xml">
+                <graph string="Thống Kê Doanh Thu Hợp Đồng" type="bar">
+                    <field name="ngay_tao" interval="month"/>
+                    <field name="nhan_vien_phu_trach"/>
+                    <field name="gia_tri_tai_lieu" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- PIVOT VIEW - DASHBOARD -->
+        <record id="view_tai_lieu_pivot" model="ir.ui.view">
+            <field name="name">tai_lieu.ke_toa.pivot</field>
+            <field name="model">tai_lieu.ke_toa</field>
+            <field name="arch" type="xml">
+                <pivot string="Bảng Phân Tích Tài Liệu">
+                    <field name="nhan_vien_phu_trach" type="row"/>
+                    <field name="loai_tai_lieu" type="col"/>
+                    <field name="gia_tri_tai_lieu" type="measure"/>
+                </pivot>
             </field>
         </record>
 
@@ -222,7 +268,7 @@
         <record id="action_tai_lieu" model="ir.actions.act_window">
             <field name="name">Tài Liệu</field>
             <field name="res_model">tai_lieu.ke_toa</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,graph,pivot</field>
             <field name="context">{'search_default_group_trang_thai': 1}</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Bấm để tạo tài liệu mới.</p>

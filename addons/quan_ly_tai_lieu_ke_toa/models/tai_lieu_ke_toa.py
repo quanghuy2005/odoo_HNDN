@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class TaiLieuKeToa(models.Model):
@@ -55,6 +55,12 @@ class TaiLieuKeToa(models.Model):
         'hr.employee',
         string='Nhân Viên Phụ Trách',
         tracking=True
+    )
+
+    gia_tri_tai_lieu = fields.Float(
+        string='Giá Trị (VND)',
+        tracking=True,
+        help='Giá trị tài chính của Hợp đồng / Báo giá / Hóa đơn'
     )
 
     # Thời gian
@@ -156,7 +162,6 @@ class TaiLieuKeToa(models.Model):
         'dinh_kem.file',
         'tai_lieu',
         string='File Đính Kèm',
-        readonly=True
     )
 
     # Thống kê
@@ -215,9 +220,6 @@ class TaiLieuKeToa(models.Model):
             raise UserError('Chỉ tài liệu mới mới có thể gửi phê duyệt!')
         
         self.write({'trang_thai': 'da_gui'})
-        
-        # Gửi email thông báo
-        self._gui_email_thong_bao('guipheduyet')
 
     def hanh_dong_yeu_cau_phe_duyet(self):
         """Yêu cầu phê duyệt từ nhân viên"""
@@ -234,8 +236,6 @@ class TaiLieuKeToa(models.Model):
             'tai_lieu': self.id,
             'trang_thai_phieu': 'pending',
         })
-        
-        self._gui_email_thong_bao('yeucaupheduyet')
 
     def hanh_dong_phe_duyet(self):
         """Phê duyệt tài liệu"""
@@ -255,8 +255,6 @@ class TaiLieuKeToa(models.Model):
                 'trang_thai_phieu': 'approved',
                 'ngay_phe_duyet': fields.Datetime.now(),
             })
-        
-        self._gui_email_thong_bao('dapheduyet')
 
     def hanh_dong_ky(self):
         """Ký tài liệu"""
@@ -269,8 +267,6 @@ class TaiLieuKeToa(models.Model):
             'ky_boi': self.env.user.id,
             'ngay_ky': fields.Datetime.now(),
         })
-        
-        self._gui_email_thong_bao('daky')
 
     def hanh_dong_hoan_tat(self):
         """Hoàn tất tài liệu"""
@@ -281,7 +277,88 @@ class TaiLieuKeToa(models.Model):
             'trang_thai': 'hoan_tat',
         })
         
-        self._gui_email_thong_bao('hoanthat')
+        # Tự động sinh hóa đơn nếu là loại tài liệu sinh tài chính
+        if self.loai_tai_lieu in ['hop_dong', 'bao_gia', 'hoa_don']:
+            self._tao_hoa_don_nhap_tu_dong()
+
+        # Tự động backup Google Drive nếu cấu hình bật
+        self._backup_to_google_drive(event='hoan_tat')
+        
+    def _backup_to_google_drive(self, event='hoan_tat'):
+        """Thực hiện backup các file đính kèm lên Google Drive theo sự kiện"""
+        drive_config = self.env['google.drive.integration'].search([('bat_backup', '=', True)], limit=1)
+        if not drive_config:
+            return
+            
+        # Kiểm tra điều kiện backup tương ứng
+        if event == 'hoan_tat' and not drive_config.backup_khi_hoan_tat:
+            return
+            
+        # Kiểm tra file
+        truong_hop_files = self.danh_sach_file_dinh_kem
+        if not truong_hop_files:
+            return
+            
+        thong_bao_backup = []
+        for doc_file in truong_hop_files:
+            if not doc_file.file_noi_dung:
+                continue
+            
+            try:
+                import base64
+                file_content_decoded = base64.b64decode(doc_file.file_noi_dung)
+                
+                mime_type = 'application/pdf'
+                if doc_file.loai_file and doc_file.loai_file.upper() in ['DOC', 'DOCX']:
+                    mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                elif doc_file.loai_file and doc_file.loai_file.upper() in ['XLS', 'XLSX']:
+                    mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                elif doc_file.loai_file and doc_file.loai_file.upper() in ['PNG', 'JPG', 'JPEG']:
+                    mime_type = 'image/jpeg'
+                
+                # Format tên file kèm theo mã tài liệu
+                ten_file_drive = f"[{self.ma_tai_lieu}] {doc_file.ten_file}"
+                
+                result = drive_config.upload_file_to_drive(
+                    file_name=ten_file_drive, 
+                    file_content=file_content_decoded,
+                    file_type=mime_type
+                )
+                
+                if result and result.get('link'):
+                    thong_bao_backup.append(f"<li><a href='{result.get('link')}' target='_blank'>{ten_file_drive}</a></li>")
+                    
+            except Exception as e:
+                self.message_post(body=f"⚠️ <b>Lỗi backup Drive ({doc_file.ten_file}):</b> {str(e)}")
+                
+        if thong_bao_backup:
+            self.message_post(body=f"☁️ <b>Đã Auto-Backup lên Google Drive:</b><ul>{''.join(thong_bao_backup)}</ul>")
+
+    def _tao_hoa_don_nhap_tu_dong(self):
+        """Tự động tạo hóa đơn nháp bên phân hệ Kế toán của Odoo"""
+        # Kiểm tra xem hệ thống có cài đặt module account không
+        if 'account.move' in self.env:
+            # Lấy một account mặc định (VD: Tài khoản doanh thu - Income Account)
+            income_account = self.env['account.account'].search([
+                ('user_type_id.type', '=', 'other'), 
+                ('user_type_id.internal_group', '=', 'income')
+            ], limit=1)
+            
+            invoice_vals = {
+                'move_type': 'out_invoice', # out_invoice: Hóa đơn bán ra cho khách
+                'partner_id': self.khach_hang.id,
+                'invoice_date': fields.Date.today(),
+                'ref': f"Tự động từ: {self.ma_tai_lieu}", 
+                'invoice_line_ids': [(0, 0, {
+                    'name': f'Thanh toán theo tài liệu/hợp đồng: {self.ten_tai_lieu}',
+                    'quantity': 1,
+                    'price_unit': self.gia_tri_tai_lieu or 0.0,
+                    'account_id': income_account.id if income_account else False,
+                })],
+            }
+            invoice = self.env['account.move'].create(invoice_vals)
+            # Ghi log vào phần trò chuyện (chatter) của tài liệu
+            self.message_post(body=f"✅ Đã tự động tạo hóa đơn nháp liên kết: <b>{invoice.name or 'Draft Invoice'}</b>")
 
     def hanh_dong_tao_phien_ban_moi(self):
         """Tạo phiên bản mới từ tài liệu hiện tại"""
@@ -309,19 +386,32 @@ class TaiLieuKeToa(models.Model):
 
     def hanh_dong_gui_cho_khach(self):
         """Gửi tài liệu cho khách hàng"""
-        self._gui_email_thong_bao('guichokhach')
+        self.ensure_one()
+        template = self.env.ref('quan_ly_tai_lieu_ke_toa.email_template_gui_cho_khach', raise_if_not_found=False)
+        if not template:
+            raise UserError(_("Không tìm thấy mẫu email 'Gửi Cho Khách Hàng'."))
+        if not self.khach_hang.email:
+            raise UserError(_("Khách hàng '%s' không có địa chỉ email.", self.khach_hang.name))
+
+        template.send_mail(self.id, force_send=True)
+        self.message_post(body=_("Email đã được gửi cho khách hàng: %s", self.khach_hang.name))
 
     def hanh_dong_huy(self):
         """Hủy tài liệu"""
         self.write({'trang_thai': 'huy'})
 
-    def _gui_email_thong_bao(self, loai_email):
-        """Gửi email thông báo dựa trên loại"""
-        # Cơ chế gửi email (có thể được mở rộng sau)
-        self.message_post(
-            body=f'Email thông báo: {loai_email} được gửi',
-            message_type='notification'
-        )
+    @api.model
+    def cron_canh_bao_het_han(self):
+        """Hàm chạy tự động (Cron Job) mỗi ngày để kiểm tra tài liệu sắp hết hạn"""
+        ngay_canh_bao = fields.Date.today() + timedelta(days=7)
+        # Tìm các tài liệu hoàn tất, có ngày hết hạn đúng bằng 7 ngày tới
+        tai_lieus = self.search([
+            ('trang_thai', 'in', ['da_ky', 'hoan_tat']),
+            ('ngay_het_han', '=', ngay_canh_bao)
+        ])
+        for tl in tai_lieus:
+            tl.write({'trang_thai': 'het_han'}) # Cập nhật trạng thái
+            tl.message_post(body="⚠️ <b>CẢNH BÁO TÀI CHÍNH:</b> Tài liệu/Hợp đồng này sẽ hết hạn trong 7 ngày tới. Vui lòng liên hệ khách hàng để gia hạn hoặc xuất hóa đơn thanh toán!", message_type="notification")
 
     # Search Methods
     def action_xem_file(self):
