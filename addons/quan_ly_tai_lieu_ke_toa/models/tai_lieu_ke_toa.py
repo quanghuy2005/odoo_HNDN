@@ -2,6 +2,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 from datetime import datetime, timedelta
+import base64
 
 
 class TaiLieuKeToa(models.Model):
@@ -137,9 +138,25 @@ class TaiLieuKeToa(models.Model):
     )
 
     ngay_ky = fields.Datetime(
-        string='Ngày Ký',
+        string='Ngày Sếp Ký',
         readonly=True,
         tracking=True
+    )
+
+    # Chữ Ký Số (E-Signature) Phase 4
+    chu_ky_nguoi_duyet = fields.Binary(
+        string="Chữ ký Giám đốc", 
+        attachment=True,
+        tracking=True
+    )
+    chu_ky_khach_hang = fields.Binary(
+        string="Chữ ký Khách hàng", 
+        attachment=True,
+        tracking=True
+    )
+    ngay_khach_ky = fields.Datetime(
+        string="Thời gian Khách ký", 
+        readonly=True
     )
 
     # Tìm kiếm
@@ -305,16 +322,16 @@ class TaiLieuKeToa(models.Model):
                 continue
             
             try:
-                import base64
+                # Odoo binary fields are base64 strings
                 file_content_decoded = base64.b64decode(doc_file.file_noi_dung)
                 
-                mime_type = 'application/pdf'
-                if doc_file.loai_file and doc_file.loai_file.upper() in ['DOC', 'DOCX']:
-                    mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                elif doc_file.loai_file and doc_file.loai_file.upper() in ['XLS', 'XLSX']:
-                    mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                elif doc_file.loai_file and doc_file.loai_file.upper() in ['PNG', 'JPG', 'JPEG']:
-                    mime_type = 'image/jpeg'
+                mime_type = 'application/octet-stream' # Default
+                if doc_file.loai_file:
+                    lf = doc_file.loai_file.upper()
+                    if lf == 'PDF': mime_type = 'application/pdf'
+                    elif lf in ['DOC', 'DOCX']: mime_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    elif lf in ['XLS', 'XLSX']: mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    elif lf in ['PNG', 'JPG', 'JPEG']: mime_type = f'image/{lf.lower().replace("jpg", "jpeg")}'
                 
                 # Format tên file kèm theo mã tài liệu
                 ten_file_drive = f"[{self.ma_tai_lieu}] {doc_file.ten_file}"
@@ -338,27 +355,36 @@ class TaiLieuKeToa(models.Model):
         """Tự động tạo hóa đơn nháp bên phân hệ Kế toán của Odoo"""
         # Kiểm tra xem hệ thống có cài đặt module account không
         if 'account.move' in self.env:
-            # Lấy một account mặc định (VD: Tài khoản doanh thu - Income Account)
+            # Tìm tài khoản doanh thu mặc định cho loại tài liệu bán ra
+            # Trong Odoo 15, search theo internal_type hoặc account_type (nếu có)
+            # Hoặc fallback về tài khoản đầu tiên thuộc nhóm Doanh Thu (Income)
             income_account = self.env['account.account'].search([
-                ('user_type_id.type', '=', 'other'), 
                 ('user_type_id.internal_group', '=', 'income')
             ], limit=1)
             
+            if not income_account:
+                # Thử tìm theo mã tài khoản phổ biến ở VN (511x) hoặc quốc tế (4xxx)
+                income_account = self.env['account.account'].search([
+                    ('code', '=like', '511%')
+                ], limit=1)
+
             invoice_vals = {
-                'move_type': 'out_invoice', # out_invoice: Hóa đơn bán ra cho khách
+                'move_type': 'out_invoice', 
                 'partner_id': self.khach_hang.id,
                 'invoice_date': fields.Date.today(),
                 'ref': f"Tự động từ: {self.ma_tai_lieu}", 
                 'invoice_line_ids': [(0, 0, {
-                    'name': f'Thanh toán theo tài liệu/hợp đồng: {self.ten_tai_lieu}',
+                    'name': f'Thanh toán theo tài liệu: {self.ten_tai_lieu}',
                     'quantity': 1,
                     'price_unit': self.gia_tri_tai_lieu or 0.0,
                     'account_id': income_account.id if income_account else False,
                 })],
             }
-            invoice = self.env['account.move'].create(invoice_vals)
-            # Ghi log vào phần trò chuyện (chatter) của tài liệu
-            self.message_post(body=f"✅ Đã tự động tạo hóa đơn nháp liên kết: <b>{invoice.name or 'Draft Invoice'}</b>")
+            try:
+                invoice = self.env['account.move'].create(invoice_vals)
+                self.message_post(body=f"✅ Đã tự động tạo hóa đơn nháp: <a href='/web#id={invoice.id}&model=account.move&view_type=form'>{invoice.name or 'Draft Invoice'}</a>")
+            except Exception as e:
+                self.message_post(body=f"⚠️ Lỗi tạo hóa đơn tự động: {str(e)}")
 
     def hanh_dong_tao_phien_ban_moi(self):
         """Tạo phiên bản mới từ tài liệu hiện tại"""

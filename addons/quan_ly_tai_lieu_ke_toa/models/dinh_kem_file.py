@@ -3,6 +3,9 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import base64
 import io
+import logging
+
+_logger = logging.getLogger(__name__)
 
 try:
     import PyPDF2
@@ -99,11 +102,12 @@ class DinhKemFile(models.Model):
 
     @api.depends('file_noi_dung')
     def _tinh_kich_thuoc_file(self):
-        """Tính kích thước file"""
+        """Tính kích thước file (KB)"""
         for dkf in self:
             if dkf.file_noi_dung:
-                # Kích thước của base64 string (ước tính)
-                dkf.kich_thuoc = len(dkf.file_noi_dung) / 1024
+                # Kích thước thực tế của file sau khi giải mã base64
+                file_decoded = base64.b64decode(dkf.file_noi_dung)
+                dkf.kich_thuoc = len(file_decoded) / 1024
             else:
                 dkf.kich_thuoc = 0.0
 

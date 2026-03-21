@@ -13,6 +13,7 @@
     ],
     'data': [
         'views/trang_web_khach_hang.xml',
+        'views/khach_hang_portal_templates.xml',
     ],
     'installable': True,
     'auto_install': False,

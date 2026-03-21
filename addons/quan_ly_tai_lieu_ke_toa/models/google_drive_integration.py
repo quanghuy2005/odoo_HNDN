@@ -67,6 +67,7 @@ class GoogleDriveIntegration(models.Model):
         """Lấy service Google Drive"""
         if not GOOGLE_AVAILABLE:
             raise UserError('Cần cài đặt: pip install google-auth-httplib2 google-auth-oauthlib')
+            raise UserError('Cần cài đặt: pip install google-auth-httplib2 google-auth-oauthlib google-api-python-client')
 
         try:
             import json
@@ -74,6 +75,7 @@ class GoogleDriveIntegration(models.Model):
             credentials = Credentials.from_service_account_info(
                 credentials_dict,
                 scopes=['https://www.googleapis.com/auth/drive.file']
+                scopes=['https://www.googleapis.com/auth/drive']
             )
             return build('drive', 'v3', credentials=credentials)
         except Exception as e:

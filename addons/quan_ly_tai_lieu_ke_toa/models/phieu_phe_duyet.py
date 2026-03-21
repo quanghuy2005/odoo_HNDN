@@ -54,7 +54,7 @@ class PhieuPheDuyet(models.Model):
     )
 
     # Methods
-    def hanh_dong_phê_duyet(self):
+    def hanh_dong_phe_duyet(self):
         """Phê duyệt"""
         self.write({
             'trang_thai_phieu': 'approved',

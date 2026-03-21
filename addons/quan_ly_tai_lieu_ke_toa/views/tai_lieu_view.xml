@@ -125,17 +125,31 @@
                                 </field>
                             </page>
 
-                            <!-- TAB KÝ -->
-                            <page string="Ký">
+                            <!-- TAB KÝ (CHỮ KÝ SỐ) -->
+                            <page string="Ký Xác Nhận">
                                 <group>
                                     <group>
                                         <field name="da_ky"/>
-                                        <field name="ky_boi" readonly="1"/>
+                                        <field name="ky_boi" readonly="1" attrs="{'invisible': [('da_ky', '=', False)]}"/>
+                                        <field name="ngay_ky" readonly="1" attrs="{'invisible': [('da_ky', '=', False)]}"/>
                                     </group>
                                     <group>
-                                        <field name="ngay_ky" readonly="1"/>
+                                        <field name="ngay_khach_ky" attrs="{'invisible': [('chu_ky_khach_hang', '=', False)]}"/>
                                     </group>
                                 </group>
+                                <separator string="KHU VỰC KÝ ĐIỆN TỬ"/>
+                                <div class="row">
+                                    <div class="col-6 text-center">
+                                        <h4>CHỮ KÝ ĐẠI DIỆN CÔNG TY</h4>
+                                        <field name="chu_ky_nguoi_duyet" widget="signature" attrs="{'readonly': [('trang_thai', 'in', ['da_ky', 'hoan_tat', 'het_han'])]}"/>
+                                        <div><i>(Giám đốc dùng chuột vẽ vào khung trên)</i></div>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <h4>CHỮ KÝ KHÁCH HÀNG</h4>
+                                        <field name="chu_ky_khach_hang" widget="image" readonly="1"/>
+                                        <div><i>(Đồng bộ tự động từ Web Portal Khách hàng)</i></div>
+                                    </div>
+                                </div>
                             </page>
 
                             <!-- TAB FILE -->

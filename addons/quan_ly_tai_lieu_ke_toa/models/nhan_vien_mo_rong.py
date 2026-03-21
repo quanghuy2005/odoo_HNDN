@@ -80,7 +80,7 @@ class NhanVienMoRongTaiLieu(models.Model):
                 if target_employee:
                     open_documents.write({'nhan_vien_phu_trach': target_employee.id})
                     for doc in open_documents:
-                        body = _("Tự động chuyển giao phụ trách từ <b>%s</b> sang <b>%s</b> do nhân viên được lưu trữ.", employee.name, target_employee.name)
+                        body = _("Tự động chuyển giao phụ trách từ <b>%s</b> sang <b>%s</b> do nhân viên được lưu trữ.") % (employee.name, target_employee.name)
                         doc.message_post(body=body)
                 else:
                     # 3. Nếu vẫn không tìm được ai, tạo một activity để admin xử lý thủ công
@@ -88,7 +88,7 @@ class NhanVienMoRongTaiLieu(models.Model):
                         doc.activity_schedule(
                             'mail.activity_data_todo',
                             summary=_('Phân công lại tài liệu'),
-                            note=_('Nhân viên phụ trách %s đã được lưu trữ. Vui lòng phân công người phụ trách mới.', employee.name),
+                            note=_('Nhân viên phụ trách %s đã được lưu trữ. Vui lòng phân công người phụ trách mới.') % employee.name,
                             user_id=self.env.ref('base.user_admin').id
                         )
         return res
