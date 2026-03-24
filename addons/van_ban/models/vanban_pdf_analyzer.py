@@ -207,7 +207,7 @@ class VanBanPdfAnalyzer(models.Model):
                 return
 
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash-lite')
 
             prompt = f"""
             Vui lòng tóm tắt nội dung văn bản sau thành 3-5 câu:
