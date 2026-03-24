@@ -84,7 +84,7 @@
         <record id="tai_lieu_ke_toa_form_signature" model="ir.ui.view">
             <field name="name">tai_lieu.ke_toa.form.signature</field>
             <field name="model">tai_lieu.ke_toa</field>
-            <field name="inherit_id" ref="quan_ly_tai_lieu_ke_toa.tai_lieu_ke_toa_form" />
+            <field name="inherit_id" ref="quan_ly_tai_lieu_ke_toa.view_tai_lieu_form" />
             <field name="arch" type="xml">
                 <xpath expr="//sheet" position="inside">
                     <separator string="✎ Quản Lý Chữ Ký Điện Tử" />
