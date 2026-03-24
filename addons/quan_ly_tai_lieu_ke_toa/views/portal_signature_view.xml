@@ -166,7 +166,7 @@
         <!-- Email Template - Yêu Cầu Ký -->
         <record id="email_yeu_cau_ky_template" model="mail.template">
             <field name="name">Yêu Cầu Ký Hợp Đồng</field>
-            <field name="model_id" ref="quan_ly_tai_lieu_ke_toa.model_tai_lieu_ke_toa" />
+            <field name="model_id" ref="model_tai_lieu_ke_toa" />
             <field name="from_partner_id" ref="base.partner_root" />
             <field name="subject">Yêu Cầu Ký Hợp Đồng: ${object.ma_tai_lieu} - ${object.ten_tai_lieu}</field>
             <field name="email_to">${object.khach_hang.email|safe}</field>
