@@ -3,3 +3,6 @@ from . import van_ban_di
 from . import ho_so_van_ban
 from . import ho_so_cong_viec
 from . import danh_muc
+from . import vanban_pdf_analyzer
+from . import vanban_fulltext_search
+from . import vanban_document_template
