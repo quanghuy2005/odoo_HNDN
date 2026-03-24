@@ -160,35 +160,5 @@
             </field>
         </record>
 
-
-        <!-- ===================== EMAIL TEMPLATES ===================== -->
-
-        <!-- Email Template - Yêu Cầu Ký -->
-        <record id="email_yeu_cau_ky_template" model="mail.template">
-            <field name="name">Yêu Cầu Ký Hợp Đồng</field>
-            <field name="model_id" ref="model_tai_lieu_ke_toa" />
-            <field name="from_partner_id" ref="base.partner_root" />
-            <field name="subject">Yêu Cầu Ký Hợp Đồng: ${object.ma_tai_lieu} - ${object.ten_tai_lieu}</field>
-            <field name="email_to">${object.khach_hang.email|safe}</field>
-            <field name="body_html" type="html">
-                <html>
-                    <body style="font-family: Arial, sans-serif;">
-                        <p>Kính gửi <strong>${object.khach_hang.name}</strong>,</p>
-                        <p>Chúng tôi yêu cầu bạn ký vào hợp đồng sau:</p>
-                        <p>
-                            <strong>📄 Mã HĐ:</strong> ${object.ma_tai_lieu}<br/>
-                            <strong>📄 Tên HĐ:</strong> ${object.ten_tai_lieu}<br/>
-                            <strong>💰 Giá Trị:</strong> ${object.gia_tri_tai_lieu:,.0f} VND<br/>
-                            <strong>📅 Hiệu Lực:</strong> ${object.ngay_hieu_luc}
-                        </p>
-                        <p><a href="${object.get_portal_url()}" style="background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">✍️ Ký Hợp Đồng Ngay</a></p>
-                        <p>Vui lòng hoàn thành ký vào hợp đồng trước ngày <strong>${object.ngay_het_han}</strong>.</p>
-                        <p>Nếu có thắc mắc, vui lòng liên hệ chúng tôi.</p>
-                        <p>Trân trọng,<br/>Đội Ngũ Quản Lý Tài Liệu</p>
-                    </body>
-                </html>
-            </field>
-        </record>
-
     </data>
 </odoo>
