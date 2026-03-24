@@ -6,6 +6,13 @@ class NhanVienMoRongTaiLieu(models.Model):
     """Mở rộng nhân viên cho module tài liệu"""
     _inherit = 'hr.employee'
 
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Tiền tệ',
+        related='company_id.currency_id',
+        readonly=True
+    )
+
     # One2many: Danh sách tài liệu nhân viên phụ trách
     danh_sach_tai_lieu = fields.One2many(
         'tai_lieu.ke_toa',
@@ -39,7 +46,7 @@ class NhanVienMoRongTaiLieu(models.Model):
         for nv in self:
             nv.so_tai_lieu = len(nv.danh_sach_tai_lieu)
             
-    @api.depends('danh_sach_tai_lieu', 'danh_sach_tai_lieu.trang_thai', 'danh_sach_tai_lieu.gia_tri_tai_lieu')
+    @api.depends('danh_sach_tai_lieu', 'danh_sach_tai_lieu.trang_thai', 'danh_sach_tai_lieu.gia_tri_tai_lieu', 'danh_sach_tai_lieu.loai_tai_lieu')
     def _tinh_kpi_hop_dong(self):
         """Tính toán KPI hợp đồng đã hoàn tất của nhân viên"""
         for nv in self:
@@ -70,7 +77,7 @@ class NhanVienMoRongTaiLieu(models.Model):
                 # 2. Nếu không có quản lý, tìm một người trong nhóm Quản lý (base.group_user)
                 if not target_employee:
                     manager_user = self.env['res.users'].search([
-                        ('groups_id', 'in', self.env.ref('base.group_user').id),
+                        ('groups_id', 'in', [self.env.ref('base.group_user').id]),
                         ('employee_id', '!=', False),
                         ('active', '=', True)
                     ], limit=1)

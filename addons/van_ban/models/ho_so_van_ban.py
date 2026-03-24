@@ -13,7 +13,7 @@ class HoSoVanBan(models.Model):
     thoi_gian_ket_thuc = fields.Date(string='Thời gian kết thúc')
     nguoi_lap = fields.Many2one('res.users', string='Người lập', default=lambda self: self.env.user)
     don_vi = fields.Char(string='Đơn vị')
-    khach_hang_id = fields.Many2one('res.partner', string='Khách hàng liên quan', help="Hồ sơ văn bản này thuộc về công ty/khách hàng nào", domain="[('is_company', '=', True)]")
+    khach_hang_id = fields.Many2one('res.partner', string='Khách hàng liên quan', help="Hồ sơ văn bản này thuộc về công ty/khách hàng nào")
     
     trang_thai = fields.Selection([
         ('dang_xu_ly', 'Đang xử lý'),

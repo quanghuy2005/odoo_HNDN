@@ -17,6 +17,25 @@ services:
     #   - postgres
     # restart: unless-stopped
 
+  odoo:
+    container_name: odoo_app
+    build: .
+    depends_on:
+      - postgres-odoo-base-15-01
+    environment:
+      HOST: postgres-odoo-base-15-01
+      PORT: 5432
+      USER: ${POSTGRES_USER:-odoo}
+      PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+      DB_NAME: ${POSTGRES_DB:-odoo}
+    ports:
+      - "8069:8069"
+    volumes:
+      - /home/quang/TTDN-15-01-N1/addons:/mnt/extra-addons
+      - /home/quang/TTDN-15-01-N1:/home/quang/TTDN-15-01-N1
+    restart: unless-stopped
+    command: odoo --addons-path=/mnt/extra-addons --database=${POSTGRES_DB:-odoo} --db_user=${POSTGRES_USER:-odoo} --db_password=${POSTGRES_PASSWORD:-odoo} --db_host=postgres-odoo-base-15-01
+
   # pgadmin:
   #   container_name: pgadmin_container
   #   image: dpage/pgadmin4

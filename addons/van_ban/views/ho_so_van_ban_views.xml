@@ -20,6 +20,7 @@
                             <group>
                                 <field name="ten_ho_so"/>
                                 <field name="ma_ho_so"/>
+                                <field name="khach_hang_id"/>
                                 <field name="thoi_gian_bat_dau"/>
                                 <field name="thoi_gian_ket_thuc"/>
                                 <field name="nguoi_lap"/>
@@ -58,6 +59,7 @@
                     <field name="name"/>
                     <field name="ten_ho_so"/>
                     <field name="ma_ho_so"/>
+                    <field name="khach_hang_id"/>
                     <field name="thoi_gian_bat_dau"/>
                     <field name="nguoi_lap"/>
                     <field name="loai_ho_so"/>
@@ -75,6 +77,7 @@
                     <field name="name"/>
                     <field name="ten_ho_so"/>
                     <field name="ma_ho_so"/>
+                    <field name="khach_hang_id"/>
                     <field name="nguoi_lap"/>
                     <separator/>
                     <filter string="Đang xử lý" name="dang_xu_ly" domain="[('trang_thai', '=', 'dang_xu_ly')]"/>

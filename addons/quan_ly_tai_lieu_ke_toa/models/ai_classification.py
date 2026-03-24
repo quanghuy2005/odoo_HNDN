@@ -14,6 +14,11 @@ try:
 except ImportError:
     OPENAI_AVAILABLE = False
 
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
 
 class AIConfiguration(models.Model):
     """Cấu hình AI cho tóm tắt tài liệu"""
@@ -30,18 +35,19 @@ class AIConfiguration(models.Model):
     loai_ai = fields.Selection([
         ('claude', 'Claude (Anthropic)'),
         ('chatgpt', 'ChatGPT (OpenAI)'),
+        ('gemini', 'Google Gemini (Miễn phí)'),
     ], string='Loại AI', required=True, default='claude')
 
     api_key = fields.Char(
         string='API Key',
         required=True,
-        help='Lấy từ: https://console.anthropic.com (Claude) hoặc https://platform.openai.com (ChatGPT)'
+        help='Lấy từ: aistudio.google.com (Gemini), platform.openai.com (ChatGPT)'
     )
 
     model_name = fields.Char(
         string='Model Name',
         default='claude-3-sonnet-20240229',
-        help='Claude: claude-3-sonnet-... | ChatGPT: gpt-4, gpt-3.5-turbo'
+        help='Claude: claude-3... | ChatGPT: gpt-3.5-turbo | Gemini: gemini-2.0-flash'
     )
 
     bat_tom_tat = fields.Boolean(
@@ -60,11 +66,23 @@ class AIConfiguration(models.Model):
         ('en', 'English'),
     ], string='Ngôn Ngữ', default='vi')
 
+    @api.onchange('loai_ai')
+    def _onchange_loai_ai(self):
+        """Tự động đổi tên model mặc định khi người dùng chọn loại AI để tránh lỗi API"""
+        if self.loai_ai == 'chatgpt':
+            self.model_name = 'gpt-3.5-turbo'
+        elif self.loai_ai == 'claude':
+            self.model_name = 'claude-3-sonnet-20240229'
+        elif self.loai_ai == 'gemini':
+            self.model_name = 'gemini-1.5-flash'
+
     def test_api_connection(self):
         """Test kết nối API"""
         try:
             if self.loai_ai == 'claude':
                 return self._test_claude()
+            elif self.loai_ai == 'gemini':
+                return self._test_gemini()
             else:
                 return self._test_chatgpt()
         except Exception as e:
@@ -103,8 +121,8 @@ class AIConfiguration(models.Model):
             raise UserError('Cần cài đặt: pip install openai')
 
         try:
-            openai.api_key = self.api_key
-            response = openai.ChatCompletion.create(
+            client = openai.OpenAI(api_key=self.api_key)
+            response = client.chat.completions.create(
                 model=self.model_name,
                 messages=[
                     {"role": "user", "content": "Xin chào, hãy nói lời chào."}
@@ -124,6 +142,28 @@ class AIConfiguration(models.Model):
         except Exception as e:
             raise UserError(f'ChatGPT API Error: {str(e)}')
 
+    def _test_gemini(self):
+        """Test Gemini API"""
+        if not GEMINI_AVAILABLE:
+            raise UserError('Cần cài đặt: pip install google-generativeai')
+
+        try:
+            genai.configure(api_key=self.api_key)
+            model = genai.GenerativeModel(self.model_name)
+            response = model.generate_content("Xin chào, hãy nói lời chào.")
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Thành Công!',
+                    'message': f'Gemini API Connected: {response.text[:80]}',
+                    'type': 'success',
+                }
+            }
+        except Exception as e:
+            raise UserError(f'Gemini API Error: {str(e)}')
+
     def tom_tat_noi_dung(self, noi_dung):
         """Tóm tắt nội dung bằng AI"""
         if not self.bat_tom_tat or not noi_dung:
@@ -134,6 +174,8 @@ class AIConfiguration(models.Model):
         try:
             if self.loai_ai == 'claude':
                 return self._tom_tat_claude(prompt)
+            elif self.loai_ai == 'gemini':
+                return self._tom_tat_gemini(prompt)
             else:
                 return self._tom_tat_chatgpt(prompt)
         except Exception as e:
@@ -177,8 +219,8 @@ Summary:"""
 
     def _tom_tat_chatgpt(self, prompt):
         """Tóm tắt bằng ChatGPT"""
-        openai.api_key = self.api_key
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=self.api_key)
+        response = client.chat.completions.create(
             model=self.model_name,
             messages=[
                 {"role": "user", "content": prompt}
@@ -186,6 +228,13 @@ Summary:"""
             max_tokens=500
         )
         return response.choices[0].message.content
+
+    def _tom_tat_gemini(self, prompt):
+        """Tóm tắt bằng Gemini"""
+        genai.configure(api_key=self.api_key)
+        model = genai.GenerativeModel(self.model_name)
+        response = model.generate_content(prompt)
+        return response.text
 
     def phan_loai_tai_lieu(self, noi_dung):
         """Gợi ý loại tài liệu dựa trên nội dung"""
@@ -200,6 +249,8 @@ Loại tài liệu gợi ý:"""
         try:
             if self.loai_ai == 'claude':
                 return self._tom_tat_claude(prompt)
+            elif self.loai_ai == 'gemini':
+                return self._tom_tat_gemini(prompt)
             else:
                 return self._tom_tat_chatgpt(prompt)
         except Exception as e:

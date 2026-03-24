@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import http, _
+from odoo import http, _, fields
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
 from odoo.http import request
 
@@ -8,28 +8,34 @@ class KhachHangPortal(CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         values = super(KhachHangPortal, self)._prepare_home_portal_values(counters)
         
-        partner = request.env.user.partner_id
+        partner = request.env.user.partner_id.commercial_partner_id
         
         # Đếm số lượng Hợp đồng kế toán và Hồ sơ hành chính
         if 'hop_dong_count' in counters:
-            hop_dong_count = request.env['tai_lieu.ke_toa'].sudo().search_count([('khach_hang', '=', partner.id)]) \
-                if request.env['ir.model'].sudo().search([('model', '=', 'tai_lieu.ke_toa')]) else 0
-            values['hop_dong_count'] = hop_dong_count
+            if 'tai_lieu.ke_toa' in request.env:
+                values['hop_dong_count'] = request.env['tai_lieu.ke_toa'].sudo().search_count([('khach_hang', 'child_of', partner.id)])
+            else:
+                values['hop_dong_count'] = 0
             
         if 'ho_so_count' in counters:
-            ho_so_count = request.env['ho_so_van_ban'].sudo().search_count([('khach_hang_id', '=', partner.id)]) \
-                if request.env['ir.model'].sudo().search([('model', '=', 'ho_so_van_ban')]) else 0
-            values['ho_so_count'] = ho_so_count
+            if 'ho_so_van_ban' in request.env:
+                values['ho_so_count'] = request.env['ho_so_van_ban'].sudo().search_count([('khach_hang_id', 'child_of', partner.id)])
+            else:
+                values['ho_so_count'] = 0
             
         return values
 
     @http.route(['/my/hop_dong', '/my/hop_dong/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_hop_dong(self, page=1, **kw):
         values = self._prepare_portal_layout_values()
-        partner = request.env.user.partner_id
+        partner = request.env.user.partner_id.commercial_partner_id
+        
+        if 'tai_lieu.ke_toa' not in request.env:
+            return request.redirect('/my')
+            
         TaiLieu = request.env['tai_lieu.ke_toa'].sudo()
 
-        domain = [('khach_hang', '=', partner.id)]
+        domain = [('khach_hang', 'child_of', partner.id)]
         hop_dong_count = TaiLieu.search_count(domain)
 
         pager = portal_pager(
@@ -52,10 +58,14 @@ class KhachHangPortal(CustomerPortal):
     @http.route(['/my/ho_so', '/my/ho_so/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_ho_so(self, page=1, **kw):
         values = self._prepare_portal_layout_values()
-        partner = request.env.user.partner_id
+        partner = request.env.user.partner_id.commercial_partner_id
+        
+        if 'ho_so_van_ban' not in request.env:
+            return request.redirect('/my')
+            
         HoSo = request.env['ho_so_van_ban'].sudo()
 
-        domain = [('khach_hang_id', '=', partner.id)]
+        domain = [('khach_hang_id', 'child_of', partner.id)]
         ho_so_count = HoSo.search_count(domain)
 
         pager = portal_pager(
@@ -78,8 +88,11 @@ class KhachHangPortal(CustomerPortal):
     @http.route(['/my/hop_dong/ky/<model("tai_lieu.ke_toa"):hop_dong>'], type='http', auth="user", website=True)
     def portal_my_hop_dong_ky(self, hop_dong, **kw):
         """Hiển thị trang Vẽ chữ ký cho 1 Hợp đồng cụ thể"""
+        if 'tai_lieu.ke_toa' not in request.env:
+            return request.redirect('/my')
+            
         # Kiểm tra quyền tự nhiên: Chỉ cho phép ký nếu đúng là Hợp đồng của đối tác đang đăng nhập
-        if hop_dong.khach_hang.id != request.env.user.partner_id.id:
+        if hop_dong.khach_hang.commercial_partner_id.id != request.env.user.partner_id.commercial_partner_id.id:
             return request.redirect('/my/hop_dong')
             
         values = self._prepare_portal_layout_values()
@@ -92,10 +105,13 @@ class KhachHangPortal(CustomerPortal):
     @http.route(['/my/hop_dong/luu_chu_ky'], type='json', auth="user", methods=['POST'], website=True)
     def portal_my_hop_dong_luu_chu_ky(self, doc_id, signature, **kw):
         """API nhận luồng dội về Base64 Ảnh chữ ký từ trình duyệt và Lưu vào Database Odoo"""
+        if 'tai_lieu.ke_toa' not in request.env:
+            return {'error': 'Hệ thống tài liệu chưa được cài đặt.'}
+            
         hop_dong = request.env['tai_lieu.ke_toa'].sudo().browse(int(doc_id))
         
         # Validation
-        if not hop_dong.exists() or hop_dong.khach_hang.id != request.env.user.partner_id.id:
+        if not hop_dong.exists() or hop_dong.khach_hang.commercial_partner_id.id != request.env.user.partner_id.commercial_partner_id.id:
             return {'error': 'Không có quyền truy cập hợp đồng này.'}
             
         if hop_dong.trang_thai in ['da_ky', 'hoan_tat', 'het_han']:
@@ -122,4 +138,3 @@ class KhachHangPortal(CustomerPortal):
             return {'success': True}
         except Exception as e:
             return {'error': str(e)}
-

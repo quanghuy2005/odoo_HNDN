@@ -127,7 +127,59 @@
             <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
         </record>
 
+        <!-- RULE 6: Tài Liệu - Portal Users chỉ xem tài liệu của công ty/khách hàng của mình -->
+        <record id="rule_tai_lieu_portal" model="ir.rule">
+            <field name="name">Tài Liệu - Portal Xem Tài Liệu Của Mình</field>
+            <field name="model_id" ref="model_tai_lieu_ke_toa"/>
+            <field name="domain_force">
+                [
+                    '|',
+                    ('khach_hang', '=', user.partner_id.commercial_partner_id.id),
+                    ('khach_hang', 'child_of', user.partner_id.commercial_partner_id.id)
+                ]
+            </field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- RULE 7: File Đính Kèm - Portal Users chỉ xem file của tài liệu họ có quyền xem -->
+        <record id="rule_dinh_kem_file_portal" model="ir.rule">
+            <field name="name">File Đính Kèm - Portal Xem File Của Mình</field>
+            <field name="model_id" ref="model_dinh_kem_file"/>
+            <field name="domain_force">
+                [
+                    '|',
+                    ('tai_lieu.khach_hang', '=', user.partner_id.commercial_partner_id.id),
+                    ('tai_lieu.khach_hang', 'child_of', user.partner_id.commercial_partner_id.id)
+                ]
+            </field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- RULE 8: Phiếu Phê Duyệt - Portal Users chỉ xem phiếu của tài liệu họ có quyền xem -->
+        <record id="rule_phieu_phe_duyet_portal" model="ir.rule">
+            <field name="name">Phiếu Phê Duyệt - Portal Xem Phiếu Của Mình</field>
+            <field name="model_id" ref="model_phieu_phe_duyet"/>
+            <field name="domain_force">
+                [
+                    '|',
+                    ('tai_lieu.khach_hang', '=', user.partner_id.commercial_partner_id.id),
+                    ('tai_lieu.khach_hang', 'child_of', user.partner_id.commercial_partner_id.id)
+                ]
+            </field>
+            <field name="perm_read">True</field>
+            <field name="perm_write">False</field>
+            <field name="perm_create">False</field>
+            <field name="perm_unlink">False</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
     </data>
 </odoo>
-
-

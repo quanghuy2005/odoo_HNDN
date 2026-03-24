@@ -48,14 +48,26 @@ class TaiLieuKeToa(models.Model):
         'res.partner',
         string='Khách Hàng',
         required=True,
-        tracking=True,
-        domain=[('is_company', '=', False)]
+        tracking=True
     )
 
     nhan_vien_phu_trach = fields.Many2one(
         'hr.employee',
         string='Nhân Viên Phụ Trách',
         tracking=True
+    )
+
+    company_id = fields.Many2one(
+        'res.company',
+        string='Công Ty',
+        default=lambda self: self.env.company
+    )
+
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Tiền Tệ',
+        related='company_id.currency_id',
+        readonly=True
     )
 
     gia_tri_tai_lieu = fields.Float(
@@ -181,6 +193,12 @@ class TaiLieuKeToa(models.Model):
         string='File Đính Kèm',
     )
 
+    file_dinh_kem_chinh_id = fields.Many2one(
+        'dinh_kem.file',
+        string='File Đính Kèm Chính',
+        compute='_tinh_file_dinh_kem_chinh'
+    )
+
     # Thống kê
     so_luong_phe_duyet = fields.Integer(
         string='Số Phê Duyệt',
@@ -229,6 +247,19 @@ class TaiLieuKeToa(models.Model):
         """Tính số lượng file"""
         for td in self:
             td.so_luong_file = len(td.danh_sach_file_dinh_kem)
+
+    @api.depends('danh_sach_file_dinh_kem', 'danh_sach_file_dinh_kem.la_file_chinh', 'danh_sach_file_dinh_kem.ngay_tai_len')
+    def _tinh_file_dinh_kem_chinh(self):
+        """Chọn file chính để hiển thị/tải xuống nhanh"""
+        for td in self:
+            files = td.danh_sach_file_dinh_kem.sorted(
+                key=lambda f: (
+                    0 if f.la_file_chinh else 1,
+                    -(fields.Datetime.to_datetime(f.ngay_tai_len).timestamp() if f.ngay_tai_len else 0),
+                    -f.id,
+                )
+            )
+            td.file_dinh_kem_chinh_id = files[:1].id if files else False
 
     # Business Logic Methods
     def hanh_dong_gui_phe_duyet(self):

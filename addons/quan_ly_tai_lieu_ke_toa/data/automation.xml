@@ -7,6 +7,7 @@
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="trigger">on_write</field>
             <field name="active">True</field>
+            <field name="filter_pre_domain">[('trang_thai', '!=', 'dang_duyet')]</field>
             <field name="filter_domain">[('trang_thai', '=', 'dang_duyet')]</field>
             <field name="state">email</field>
             <field name="template_id" ref="email_template_yeu_cau_phe_duyet"/>
@@ -18,6 +19,7 @@
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="trigger">on_write</field>
             <field name="active">True</field>
+            <field name="filter_pre_domain">[('trang_thai', '!=', 'da_phe_duyet')]</field>
             <field name="filter_domain">[('trang_thai', '=', 'da_phe_duyet')]</field>
             <field name="state">email</field>
             <field name="template_id" ref="email_template_da_phe_duyet"/>
@@ -29,6 +31,7 @@
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="trigger">on_write</field>
             <field name="active">True</field>
+            <field name="filter_pre_domain">[('trang_thai', '!=', 'da_ky')]</field>
             <field name="filter_domain">[('trang_thai', '=', 'da_ky')]</field>
             <field name="state">email</field>
             <field name="template_id" ref="email_template_da_ky"/>
@@ -40,6 +43,7 @@
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="trigger">on_write</field>
             <field name="active">True</field>
+            <field name="filter_pre_domain">[('trang_thai', '!=', 'hoan_tat')]</field>
             <field name="filter_domain">[('trang_thai', '=', 'hoan_tat')]</field>
             <field name="state">email</field>
             <field name="template_id" ref="email_template_hoan_tat"/>

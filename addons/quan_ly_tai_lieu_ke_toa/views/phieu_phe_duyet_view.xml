@@ -23,7 +23,7 @@
             <field name="arch" type="xml">
                 <form string="Phiếu Phê Duyệt">
                     <header>
-                        <button name="hanh_dong_phê_duyet" string="Phê Duyệt" 
+                        <button name="hanh_dong_phe_duyet" string="Phê Duyệt" 
                             type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai_phieu', '!=', 'pending')]}"/>
                         <button name="hanh_dong_tu_choi" string="Từ Chối" 
                             type="object" attrs="{'invisible': [('trang_thai_phieu', '!=', 'pending')]}"/>

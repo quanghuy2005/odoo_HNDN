@@ -12,8 +12,7 @@ class NhanVienMoRong(models.Model):
         'nhan_vien_khach_hang_rel',
         'nhan_vien_id',
         'khach_hang_id',
-        string='Danh Sách Khách Hàng Phụ Trách',
-        domain=[('is_company', '=', False)]
+        string='Danh Sách Khách Hàng Phụ Trách'
     )
 
     # Computed field: số lượng khách hàng
@@ -31,6 +30,7 @@ class NhanVienMoRong(models.Model):
 
     def hanh_dong_xem_khach_hang(self):
         """Action để xem danh sách khách hàng của nhân viên"""
+        self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Khách Hàng',

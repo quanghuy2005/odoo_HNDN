@@ -20,6 +20,7 @@
         'data/tao_day_chu.xml',
         'data/email_template.xml',
         'data/automation.xml',
+        'data/cron_job.xml',
         'views/tai_lieu_view.xml',
         'views/phieu_phe_duyet_view.xml',
         'views/dinh_kem_file_view.xml',
@@ -43,6 +44,6 @@
     - AI Tóm Tắt & Phân Loại
     ''',
     'external_dependencies': {
-        'python': ['anthropic', 'google-auth-httplib2', 'google-auth-oauthlib', 'openai'],
+        'python': ['anthropic', 'openai', 'PyPDF2', 'google.generativeai'],
     },
 }

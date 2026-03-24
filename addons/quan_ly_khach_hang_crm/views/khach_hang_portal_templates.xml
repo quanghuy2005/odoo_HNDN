@@ -64,8 +64,8 @@
                                     <span t-field="doc.ngay_hieu_luc"/>
                                 </td>
                                 <td>
-                                    <t t-if="doc.file_dinh_kem">
-                                        <a t-attf-href="/web/content/tai_lieu.ke_toa/#{doc.id}/file_dinh_kem/#{doc.file_name}?download=true" target="_blank" class="btn btn-sm btn-primary mb-1">
+                                    <t t-if="doc.file_dinh_kem_chinh_id">
+                                        <a t-attf-href="/web/content/dinh_kem.file/#{doc.file_dinh_kem_chinh_id.id}/file_noi_dung/#{doc.file_dinh_kem_chinh_id.ten_file}?download=true" target="_blank" class="btn btn-sm btn-primary mb-1">
                                             <i class="fa fa-download"/> Tải về
                                         </a>
                                         <br/>
@@ -141,6 +141,7 @@
                 <!-- JAVASCRIPT XỬ LÝ VẼ LOGIC -->
                 <script type="text/javascript">
                     document.addEventListener("DOMContentLoaded", function () {
+                        var ajax = odoo.require('web.ajax');
                         var canvas = document.getElementById('signature-pad');
                         var ctx = canvas.getContext('2d');
                         var drawing = false;
@@ -213,22 +214,18 @@
                             this.disabled = true;
 
                             var dataURL = canvas.toDataURL("image/png");
-                            
-                            // Gửi AJAX POST về API Odoo vừa viết
-                            odoo.define('quan_ly_khach_hang_crm.signature_submit', function (require) {
-                                var ajax = require('web.ajax');
-                                ajax.jsonRpc('/my/hop_dong/luu_chu_ky', 'call', {
-                                    'doc_id': "<t t-esc='hop_dong.id'/>",
-                                    'signature': dataURL
-                                }).then(function (result) {
-                                    if(result.error) {
-                                        alert("LỖI: " + result.error);
-                                        window.location.reload();
-                                    } else {
-                                        alert("Ký thành công! Hợp đồng đã có hiệu lực pháp lý.");
-                                        window.location.href = '/my/hop_dong';
-                                    }
-                                });
+
+                            ajax.jsonRpc('/my/hop_dong/luu_chu_ky', 'call', {
+                                'doc_id': "<t t-esc='hop_dong.id'/>",
+                                'signature': dataURL
+                            }).then(function (result) {
+                                if(result.error) {
+                                    alert("LỖI: " + result.error);
+                                    window.location.reload();
+                                } else {
+                                    alert("Ký thành công! Hợp đồng đã có hiệu lực pháp lý.");
+                                    window.location.href = '/my/hop_dong';
+                                }
                             });
                         });
                     });

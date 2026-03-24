@@ -2,29 +2,14 @@
 <odoo>
     <data>
         <record id="view_partner_form_inherit_crm_tai_lieu" model="ir.ui.view">
-            <field name="name">res.partner.form.inherit.crm.tai.lieu</field>
+            <field name="name">res.partner.form.crm.money.widget</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="inherit_id" ref="quan_ly_khach_hang_crm.view_khach_hang_form_mo_rong"/>
             <field name="arch" type="xml">
-                <!-- Thêm nút Smart Button lên góc phải màn hình -->
-                <div name="button_box" position="inside">
-                    <button name="action_xem_tai_lieu" type="object" class="oe_stat_button" icon="fa-file-text-o" attrs="{'invisible': [('so_luong_tai_lieu', '=', 0)]}">
-                        <div class="o_stat_info">
-                            <field name="so_luong_tai_lieu" class="o_stat_value"/>
-                            <span class="o_stat_text">Tài Liệu</span>
-                        </div>
-                    </button>
-                </div>
-                
-                <!-- Hiển thị Tổng Giá Trị vào một Tab mới -->
-                <notebook position="inside">
-                    <page string="Thống Kê Tài Liệu" name="tai_lieu_ke_toan">
-                        <group>
-                            <field name="so_tien_da_ky" widget="monetary"/>
-                            <field name="trang_thai_khach_hang"/>
-                        </group>
-                    </page>
-                </notebook>
+                <xpath expr="//field[@name='so_tien_da_ky']" position="attributes">
+                    <attribute name="widget">monetary</attribute>
+                    <attribute name="options">{'currency_field': 'currency_id'}</attribute>
+                </xpath>
             </field>
         </record>
     </data>

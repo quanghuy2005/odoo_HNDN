@@ -35,7 +35,7 @@
                                 <field name="chuc_vu_dai_dien"/>
                             </group>
                             <group>
-                                <field name="so_tien_da_ky"/>
+                                <field name="so_tien_da_ky" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
                         </group>
                         <group>
@@ -44,6 +44,19 @@
                         <group>
                             <field name="ghi_chu_kinh_doanh" nolabel="1" colspan="2"/>
                         </group>
+                    </page>
+                    <page string="Portal User">
+                        <group>
+                            <group>
+                                <field name="user_id" readonly="1"/>
+                                <field name="co_portal_user" readonly="1"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            <strong>Portal User:</strong> Cho phép khách hàng xem hợp đồng, hồ sơ, và ký tài liệu trực tuyến.
+                        </div>
+                        <button name="tao_portal_user" string="🔑 Tạo Portal User" type="object" 
+                            class="btn btn-primary" attrs="{'invisible': [('co_portal_user', '=', True)]}"/>
                     </page>
                 </xpath>
             </field>
@@ -91,7 +104,6 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_khach_hang_list"/>
             <field name="search_view_id" ref="view_khach_hang_search"/>
-            <field name="domain">[('is_company', '=', False)]</field>
         </record>
 
         <!-- Menu chính trang web -->

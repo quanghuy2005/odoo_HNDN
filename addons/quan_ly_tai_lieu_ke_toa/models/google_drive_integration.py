@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
+from odoo import models, fields
 from odoo.exceptions import UserError
-import base64
 import io
 
 try:
-    from google.auth.transport.requests import Request
     from google.oauth2.service_account import Credentials
     from googleapiclient.discovery import build
-    from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
+    from googleapiclient.http import MediaIoBaseUpload
     GOOGLE_AVAILABLE = True
 except ImportError:
     GOOGLE_AVAILABLE = False
@@ -66,15 +64,15 @@ class GoogleDriveIntegration(models.Model):
     def _get_drive_service(self):
         """Lấy service Google Drive"""
         if not GOOGLE_AVAILABLE:
-            raise UserError('Cần cài đặt: pip install google-auth-httplib2 google-auth-oauthlib')
-            raise UserError('Cần cài đặt: pip install google-auth-httplib2 google-auth-oauthlib google-api-python-client')
+            raise UserError(
+                'Cần cài đặt: pip install google-auth-httplib2 google-auth-oauthlib google-api-python-client'
+            )
 
         try:
             import json
             credentials_dict = json.loads(self.service_account_json)
             credentials = Credentials.from_service_account_info(
                 credentials_dict,
-                scopes=['https://www.googleapis.com/auth/drive.file']
                 scopes=['https://www.googleapis.com/auth/drive']
             )
             return build('drive', 'v3', credentials=credentials)

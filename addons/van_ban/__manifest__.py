@@ -34,8 +34,4 @@
         'views/danh_muc_views.xml',
         'views/menu_views.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
 }
