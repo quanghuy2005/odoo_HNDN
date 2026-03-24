@@ -15,6 +15,7 @@
         'views/trang_web_khach_hang.xml',
         'views/khach_hang_view.xml',
         'views/khach_hang_portal_templates.xml',
+        'views/res_partner_test_marker_views.xml',
     ],
     'installable': True,
     'auto_install': False,

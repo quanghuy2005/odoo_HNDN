@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ===================== GROUPS ===================== -->
+        
+        <!-- Portal Customer Group -->
+        <record id="group_quan_ly_khach_hang_portal" model="res.groups">
+            <field name="name">Portal Customer - Khách Hàng Portal</field>
+            <field name="category_id" ref="base.module_category_usability" />
+        </record>
+
+        <!-- Document Manager Group -->
+        <record id="group_quan_ly_tai_lieu_manager" model="res.groups">
+            <field name="name">Document Manager - Quản Lý Tài Liệu</field>
+            <field name="category_id" ref="base.module_category_accounting" />
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+        </record>
+
+        <!-- Document Admin Group -->
+        <record id="group_quan_ly_tai_lieu_admin" model="res.groups">
+            <field name="name">Document Admin - Admin Tài Liệu</field>
+            <field name="category_id" ref="base.module_category_accounting" />
+            <field name="implied_ids" eval="[(4, ref('group_quan_ly_tai_lieu_manager'))]" />
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ===================== TAI_LIEU.KY_DIGITAL VIEWS ===================== -->
+        
+        <!-- Tree View -->
+        <record id="tai_lieu_ky_digital_tree" model="ir.ui.view">
+            <field name="name">tai_lieu.ky_digital.tree</field>
+            <field name="model">tai_lieu.ky_digital</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="tai_lieu" />
+                    <field name="khach_hang_ky" />
+                    <field name="email_ky" />
+                    <field name="thoi_gian_ky" />
+                    <field name="trang_thai_ky" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="tai_lieu_ky_digital_form" model="ir.ui.view">
+            <field name="name">tai_lieu.ky_digital.form</field>
+            <field name="model">tai_lieu.ky_digital</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="tai_lieu" readonly="1" />
+                                <field name="khach_hang_ky" readonly="1" />
+                                <field name="email_ky" readonly="1" />
+                            </group>
+                            <group>
+                                <field name="thoi_gian_ky" readonly="1" />
+                                <field name="trang_thai_ky" readonly="1" />
+                            </group>
+                        </group>
+                        <separator string="Chữ Ký" />
+                        <group>
+                            <field name="chu_ky_image" widget="image" />
+                        </group>
+                        <field name="ghi_chu" placeholder="Ghi chú của người ký..." />
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="tai_lieu_ky_digital_search" model="ir.ui.view">
+            <field name="name">tai_lieu.ky_digital.search</field>
+            <field name="model">tai_lieu.ky_digital</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="tai_lieu" />
+                    <field name="khach_hang_ky" />
+                    <field name="email_ky" />
+                    <separator />
+                    <filter name="da_ky" string="Đã Ký" domain="[('trang_thai_ky', '=', 'da_ky')]" />
+                    <filter name="huy_bo" string="Hủy Bỏ" domain="[('trang_thai_ky', '=', 'huy_bo')]" />
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_tai_lieu_ky_digital" model="ir.actions.act_window">
+            <field name="name">Chữ Ký Điện Tử</field>
+            <field name="res_model">tai_lieu.ky_digital</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="tai_lieu_ky_digital_tree" />
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_tai_lieu_ky_digital" name="Chữ Ký Điện Tử" 
+                  action="action_tai_lieu_ky_digital" 
+                  parent="quan_ly_tai_lieu_ke_toa.menu_tai_lieu_ke_toa_root"
+                  sequence="20" />
+
+
+        <!-- ===================== TAI_LIEU.KE_TOA EXTENDED VIEWS ===================== -->
+
+        <!-- Form View - Signature Tab -->
+        <record id="tai_lieu_ke_toa_form_signature" model="ir.ui.view">
+            <field name="name">tai_lieu.ke_toa.form.signature</field>
+            <field name="model">tai_lieu.ke_toa</field>
+            <field name="inherit_id" ref="quan_ly_tai_lieu_ke_toa.tai_lieu_ke_toa_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <separator string="✎ Quản Lý Chữ Ký Điện Tử" />
+                    <group>
+                        <group>
+                            <field name="co_yeu_cau_ky" />
+                            <field name="so_khach_can_ky" />
+                            <field name="trang_thai_ky" />
+                        </group>
+                        <group>
+                            <field name="so_khach_da_ky" readonly="1" />
+                            <button name="action_yeu_cau_ky" string="Yêu Cầu Ký" type="object" 
+                                    class="oe_highlight" attrs="{'invisible': [('co_yeu_cau_ky', '=', True)]}" />
+                            <button name="action_tao_link_ky" string="Tạo Link Ký" type="object" 
+                                    class="oe_link" attrs="{'invisible': [('co_yeu_cau_ky', '=', False)]}" />
+                        </group>
+                    </group>
+                    <field name="ky_digitals" mode="tree,form">
+                        <tree>
+                            <field name="khach_hang_ky" />
+                            <field name="email_ky" />
+                            <field name="thoi_gian_ky" />
+                            <field name="trang_thai_ky" />
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="khach_hang_ky" readonly="1" />
+                                    <field name="email_ky" readonly="1" />
+                                </group>
+                                <group>
+                                    <field name="thoi_gian_ky" readonly="1" />
+                                    <field name="trang_thai_ky" readonly="1" />
+                                </group>
+                            </group>
+                            <field name="chu_ky_image" widget="image" readonly="1" />
+                            <field name="ghi_chu" readonly="1" />
+                        </form>
+                    </field>
+                </xpath>
+            </field>
+        </record>
+
+
+        <!-- ===================== RES.PARTNER EXTENDED VIEWS ===================== -->
+
+        <!-- Form View - Portal Access Tab -->
+        <record id="res_partner_form_portal" model="ir.ui.view">
+            <field name="name">res.partner.form.portal</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='internal_notes']" position="after">
+                    <page string="🔐 Portal Access" name="portal_access">
+                        <group>
+                            <group>
+                                <field name="co_quyen_portal" />
+                                <field name="email_portal" />
+                            </group>
+                            <group>
+                                <field name="user_portal_id" readonly="1" />
+                            </group>
+                        </group>
+                        <group>
+                            <button name="action_tao_tai_khoan_portal" string="📝 Tạo Tài Khoản Portal" type="object" 
+                                    class="oe_highlight" attrs="{'invisible': [('user_portal_id', '!=', False)]}" />
+                            <button name="action_reset_password_portal" string="🔑 Reset Mật Khẩu" type="object" 
+                                    class="oe_link" attrs="{'invisible': [('user_portal_id', '=', False)]}" />
+                        </group>
+                        <field name="co_quyen_portal" invisible="1" />
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+        <!-- ===================== EMAIL TEMPLATES ===================== -->
+
+        <!-- Email Template - Yêu Cầu Ký -->
+        <record id="email_yeu_cau_ky_template" model="mail.template">
+            <field name="name">Yêu Cầu Ký Hợp Đồng</field>
+            <field name="model_id" ref="quan_ly_tai_lieu_ke_toa.model_tai_lieu_ke_toa" />
+            <field name="from_partner_id" ref="base.partner_root" />
+            <field name="subject">Yêu Cầu Ký Hợp Đồng: ${object.ma_tai_lieu} - ${object.ten_tai_lieu}</field>
+            <field name="email_to">${object.khach_hang.email|safe}</field>
+            <field name="body_html" type="html">
+                <html>
+                    <body style="font-family: Arial, sans-serif;">
+                        <p>Kính gửi <strong>${object.khach_hang.name}</strong>,</p>
+                        <p>Chúng tôi yêu cầu bạn ký vào hợp đồng sau:</p>
+                        <p>
+                            <strong>📄 Mã HĐ:</strong> ${object.ma_tai_lieu}<br/>
+                            <strong>📄 Tên HĐ:</strong> ${object.ten_tai_lieu}<br/>
+                            <strong>💰 Giá Trị:</strong> ${object.gia_tri_tai_lieu:,.0f} VND<br/>
+                            <strong>📅 Hiệu Lực:</strong> ${object.ngay_hieu_luc}
+                        </p>
+                        <p><a href="${object.get_portal_url()}" style="background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">✍️ Ký Hợp Đồng Ngay</a></p>
+                        <p>Vui lòng hoàn thành ký vào hợp đồng trước ngày <strong>${object.ngay_het_han}</strong>.</p>
+                        <p>Nếu có thắc mắc, vui lòng liên hệ chúng tôi.</p>
+                        <p>Trân trọng,<br/>Đội Ngũ Quản Lý Tài Liệu</p>
+                    </body>
+                </html>
+            </field>
+        </record>
+
+    </data>
+</odoo>

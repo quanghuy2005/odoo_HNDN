@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ===================== RES.PARTNER TEST MARKER ===================== -->
+
+        <!-- Form View - Test Marker Tab -->
+        <record id="res_partner_form_test_marker" model="ir.ui.view">
+            <field name="name">res.partner.form.test.marker</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='active']" position="after">
+                    <field name="is_test_customer" />
+                    <field name="is_internal" />
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Search View - Filter Test Customers -->
+        <record id="res_partner_search_test_marker" model="ir.ui.view">
+            <field name="name">res.partner.search.test</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter" />
+            <field name="arch" type="xml">
+                <xpath expr="//search/separator[@name='filters']" position="after">
+                    <separator />
+                    <filter name="test_customers" string="🧪 Khách Test" domain="[('is_test_customer', '=', True)]" />
+                    <filter name="exclude_test" string="❌ Loại Khách Test" domain="[('is_test_customer', '=', False)]" />
+                    <separator />
+                    <filter name="internal_users" string="🏢 Nội Bộ" domain="[('is_internal', '=', True)]" />
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

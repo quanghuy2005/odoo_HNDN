@@ -15,6 +15,7 @@
         'base_automation',
     ],
     'data': [
+        'security/ir_groups.xml',
         'security/ir.model.access.csv',
         'security/ir_rule.xml',
         'data/tao_day_chu.xml',
@@ -26,6 +27,7 @@
         'views/dinh_kem_file_view.xml',
         'views/nhan_vien_view.xml',
         'views/external_api_views.xml',
+        'views/portal_signature_view.xml',
     ],
     'installable': True,
     'auto_install': False,

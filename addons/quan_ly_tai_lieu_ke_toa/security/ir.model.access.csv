@@ -9,3 +9,6 @@ access_dinh_kem_file_manager,File Đính Kèm - Quản Lý,model_dinh_kem_file,b
 access_dinh_kem_file_portal,File Đính Kèm - Portal,model_dinh_kem_file,base.group_portal,1,0,0,0
 access_google_drive_manager,Google Drive - Quản Lý,model_google_drive_integration,base.group_partner_manager,1,1,1,1
 access_ai_config_manager,AI Configuration - Quản Lý,model_ai_configuration,base.group_partner_manager,1,1,1,1
+access_ky_digital_user,Ký Điện Tử - Người Dùng,model_tai_lieu_ky_digital,base.group_user,1,1,1,0
+access_ky_digital_manager,Ký Điện Tử - Quản Lý,model_tai_lieu_ky_digital,base.group_partner_manager,1,1,1,1
+access_ky_digital_portal,Ký Điện Tử - Portal,model_tai_lieu_ky_digital,base.group_portal,1,1,1,0
