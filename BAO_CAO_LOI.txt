@@ -118,15 +118,45 @@ Kết quả: ✅ Menu loads correctly, no ParseError
 
 ---
 
-[TRẠNG THÁI CUỐI CÙNG - 2026-03-24 16:52]
+[LỖI #6 RESOLVED] ✅ RPC_ERROR - Parent Menu Not Found
+Thời gian: 2026-03-24 16:51:30
+Trạng thái: FIXED
+
+Nguyên nhân:
+- Menu trong portal_signature_view.xml:78 tham chiếu parent menu không tồn tại
+- Parent ID: quan_ly_tai_lieu_ke_toa.menu_tai_lieu_ke_toa_root (không tồn tại)
+- Root menu thực tế: menu_tai_lieu_root
+- Submenu thực tế: menu_tai_lieu_sub
+
+Error Stack:
+```
+odoo.tools.convert.ParseError: while parsing 
+/mnt/extra-addons/quan_ly_tai_lieu_ke_toa/views/portal_signature_view.xml:78,
+Cannot locate parent menu: quan_ly_tai_lieu_ke_toa.menu_tai_lieu_ke_toa_root
+```
+
+Giải pháp:
+- Sửa file: portal_signature_view.xml
+- Đổi parent từ: quan_ly_tai_lieu_ke_toa.menu_tai_lieu_ke_toa_root
+- Thành: quan_ly_tai_lieu_ke_toa.menu_tai_lieu_sub
+- Menu giờ nằm trong nhóm "Tài Liệu" (Submenu)
+
+Commit: 3f0db2e2
+
+Kết quả: ✅ RPC error resolved, module loads successfully
+
+---
+
+[TRẠNG THÁI CUỐI CÙNG - 2026-03-24 16:56]
 ✅ HTTP Status: 303 (Login Ready)
-✅ 40 modules loaded in 0.37s
+✅ 40 modules loaded in 0.39s
 ✅ No errors or warnings
 ✅ Database: PostgreSQL connected
 ✅ Dependencies: All installed
 
 🎉 **READY TO USE** 🎉
 Link: http://localhost:8069
+Login: admin / admin
 
 Các module đã available:
 ✅ quan_ly_tai_lieu_ke_toa (với AI + Digital Signatures)
