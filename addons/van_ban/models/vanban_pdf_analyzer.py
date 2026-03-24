@@ -3,11 +3,17 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import logging
 
+# Handle both PyPDF2 v1.x and v2.x
 try:
     from PyPDF2 import PdfReader
     import io
 except ImportError:
-    raise UserError(_('PyPDF2 chưa cài đặt. Vui lòng chạy: pip install PyPDF2'))
+    try:
+        # PyPDF2 v1.x old API
+        from PyPDF2 import PdfFileReader as PdfReader
+        import io
+    except ImportError:
+        raise UserError(_('PyPDF2 chưa cài đặt. Vui lòng chạy: pip install PyPDF2>=2.0'))
 
 try:
     import google.generativeai as genai
@@ -121,9 +127,31 @@ class VanBanPdfAnalyzer(models.Model):
             # Đọc PDF
             pdf_reader = PdfReader(io.BytesIO(file_data))
             text = ""
-            for page_num in range(len(pdf_reader.pages)):
-                page = pdf_reader.pages[page_num]
-                text += page.extract_text() + "\n"
+            
+            # Handle both PyPDF2 v1 and v2 API
+            try:
+                # PyPDF2 v2.x: .pages attribute
+                pages_list = pdf_reader.pages
+                num_pages = len(pages_list)
+            except (AttributeError, TypeError):
+                # PyPDF2 v1.x: getNumPages() method
+                num_pages = pdf_reader.getNumPages()
+                pages_list = None
+            
+            # Extract text from each page
+            for page_num in range(num_pages):
+                try:
+                    if pages_list is not None:
+                        # v2.x
+                        page = pages_list[page_num]
+                        text += page.extract_text() + "\n"
+                    else:
+                        # v1.x
+                        page = pdf_reader.getPage(page_num)
+                        text += page.extractText() + "\n"
+                except Exception as page_err:
+                    _logger.warning(f'Không thể trích text trang {page_num}: {str(page_err)}')
+                    continue
 
             return text[:5000]  # Giới hạn 5000 ký tự
         except Exception as e:
