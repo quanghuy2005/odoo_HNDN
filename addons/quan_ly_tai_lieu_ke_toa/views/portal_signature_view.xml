@@ -74,7 +74,7 @@
         <!-- Menu Item -->
         <menuitem id="menu_tai_lieu_ky_digital" name="Chữ Ký Điện Tử" 
                   action="quan_ly_tai_lieu_ke_toa.action_tai_lieu_ky_digital" 
-                  parent="quan_ly_tai_lieu_ke_toa.menu_tai_lieu_ke_toa_root"
+                  parent="quan_ly_tai_lieu_ke_toa.menu_tai_lieu_sub"
                   sequence="20" />
 
 
