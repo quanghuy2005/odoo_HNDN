@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- VANBAN AI PROCESSOR VIEWS -->
+
+        <!-- Tree View -->
+        <record id="view_vanban_ai_processor_tree" model="ir.ui.view">
+            <field name="name">vanban.ai.processor.tree</field>
+            <field name="model">vanban.ai.processor</field>
+            <field name="arch" type="xml">
+                <tree string="Xử Lý AI Công Văn">
+                    <field name="vanban_name" />
+                    <field name="vanban_model" />
+                    <field name="phan_loai" />
+                    <field name="trang_thai" />
+                    <field name="ngay_xu_ly" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_vanban_ai_processor_form" model="ir.ui.view">
+            <field name="name">vanban.ai.processor.form</field>
+            <field name="model">vanban.ai.processor</field>
+            <field name="arch" type="xml">
+                <form string="Xử Lý AI Công Văn">
+                    <header>
+                        <button name="action_xu_ly_ai" string="▶ Xử Lý AI" type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'cho')]}"/>
+                        <field name="trang_thai" widget="statusbar" />
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="vanban_model" />
+                                <field name="vanban_id" />
+                                <field name="vanban_name" />
+                            </group>
+                            <group>
+                                <field name="ngay_xu_ly" />
+                            </group>
+                        </group>
+
+                        <!-- NỘI DUNG -->
+                        <separator string="📝 Nội Dung"/>
+                        <field name="noi_dung_cong_van" widget="html" />
+
+                        <!-- PHÂN LOẠI -->
+                        <separator string="🔹 Phân Loại Công Văn"/>
+                        <group>
+                            <field name="phan_loai" />
+                            <field name="do_tin_cay_phan_loai" widget="progressbar" />
+                        </group>
+
+                        <!-- TỪ KHÓA -->
+                        <separator string="🔑 Từ Khóa"/>
+                        <group>
+                            <field name="tu_khoa" nolabel="1" />
+                            <field name="do_tin_cay_tu_khoa" widget="progressbar" />
+                        </group>
+
+                        <!-- TÓM TẮT -->
+                        <separator string="📋 Tóm Tắt"/>
+                        <group>
+                            <field name="tom_tat" nolabel="1" />
+                            <field name="do_tin_cay_tom_tat" widget="progressbar" />
+                        </group>
+
+                        <!-- LỖI -->
+                        <group attrs="{'invisible': [('loi', '=', False)]}">
+                            <separator string="❌ Lỗi"/>
+                            <field name="loi" readonly="1" nolabel="1" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_vanban_ai_processor_search" model="ir.ui.view">
+            <field name="name">vanban.ai.processor.search</field>
+            <field name="model">vanban.ai.processor</field>
+            <field name="arch" type="xml">
+                <search string="Xử Lý AI">
+                    <field name="vanban_name" />
+                    <field name="vanban_model" />
+                    <separator />
+                    <filter name="phan_loai_quyet_dinh" string="Quyết định" domain="[('phan_loai', '=', 'quyet_dinh')]" />
+                    <filter name="phan_loai_cong_van" string="Công văn" domain="[('phan_loai', '=', 'cong_van')]" />
+                    <filter name="phan_loai_thong_bao" string="Thông báo" domain="[('phan_loai', '=', 'thong_bao')]" />
+                    <separator />
+                    <filter name="thanh_cong" string="Thành công" domain="[('trang_thai', '=', 'thanh_cong')]" />
+                    <filter name="that_bai" string="Thất bại" domain="[('trang_thai', '=', 'that_bai')]" />
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_vanban_ai_processor" model="ir.actions.act_window">
+            <field name="name">Xử Lý AI Công Văn</field>
+            <field name="res_model">vanban.ai.processor</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_vanban_ai_processor_tree" />
+        </record>
+
+        <!-- Menu -->
+        <menuitem id="menu_vanban_ai" name="🤖 AI &amp; Phân Tích" parent="van_ban.menu_van_ban_root" sequence="30" />
+        <menuitem id="menu_vanban_ai_processor" name="Xử Lý AI" parent="menu_vanban_ai" action="action_vanban_ai_processor" sequence="10" />
+
+    </data>
+</odoo>

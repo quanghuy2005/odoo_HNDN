@@ -70,13 +70,13 @@
                                         </a>
                                         <br/>
                                         <!-- Nút Hành Động Ký -->
-                                        <t t-if="doc.trang_thai not in ['da_ky', 'hoan_tat', 'het_han']">
+                                        <t t-if="doc.chu_ky_khach_hang">
+                                            <span class="text-success"><i class="fa fa-check-circle"/> Đã Ký</span>
+                                        </t>
+                                        <t t-elif="doc.trang_thai not in ['hoan_tat', 'het_han', 'huy']">
                                             <a t-attf-href="/my/hop_dong/ky/#{doc.id}" class="btn btn-sm btn-success">
                                                 <i class="fa fa-pencil"/> Ký Xác Nhận
                                             </a>
-                                        </t>
-                                        <t t-else="">
-                                            <span class="text-success"><i class="fa fa-check-circle"/> Đã Ký</span>
                                         </t>
                                     </t>
                                     <t t-else="">
@@ -130,34 +130,49 @@
                                     </div>
                                     <div class="mt-3">
                                         <button type="button" class="btn btn-secondary" id="clear-btn"><i class="fa fa-eraser"/> Xóa Ký Lại</button>
-                                        <button type="button" class="btn btn-success" id="save-btn"><i class="fa fa-paper-plane"/> Gửi Chữ Ký Xác Nhận</button>
+                                        <button type="button" class="btn btn-success" id="save-btn" t-att-data-doc-id="hop_dong.id"><i class="fa fa-paper-plane"/> Gửi Chữ Ký Xác Nhận</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- CHATTER / LỊCH SỬ TRAO ĐỔI -->
+                        <div class="row mt-4 mb-4" id="hop_dong_communication">
+                            <div class="col-12">
+                                <h3>Lịch Sử Trao Đổi &amp; Email</h3>
+                                <t t-call="portal.message_thread">
+                                    <t t-set="object" t-value="hop_dong"/>
+                                </t>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
                 <!-- JAVASCRIPT XỬ LÝ VẼ LOGIC -->
                 <script type="text/javascript">
-                    document.addEventListener("DOMContentLoaded", function () {
-                        var ajax = odoo.require('web.ajax');
+                    function initSignature() {
                         var canvas = document.getElementById('signature-pad');
+                        if (!canvas) return; // Nếu chưa thấy canvas thì bỏ qua
+                        if (canvas.getAttribute('data-init')) return; // Chống lặp
+                        canvas.setAttribute('data-init', '1');
+
                         var ctx = canvas.getContext('2d');
                         var drawing = false;
 
-                        // Function lấy tọa độ chuột / ngón tay
                         function getPos(e) {
                             var rect = canvas.getBoundingClientRect();
-                            var x = e.clientX || (e.touches &amp;&amp; e.touches[0].clientX);
-                            var y = e.clientY || (e.touches &amp;&amp; e.touches[0].clientY);
-                            return {
-                                x: x - rect.left,
-                                y: y - rect.top
-                            };
+                            var x, y;
+                            if (e.type.indexOf('touch') !== -1) {
+                                x = e.touches[0].clientX;
+                                y = e.touches[0].clientY;
+                            } else {
+                                x = e.clientX;
+                                y = e.clientY;
+                            }
+                            return { x: x - rect.left, y: y - rect.top };
                         }
 
-                        // Event Chuột &amp; Cảm Ứng (Touch)
                         var startDrawing = function(e) {
                             drawing = true;
                             var pos = getPos(e);
@@ -170,7 +185,7 @@
                             if (!drawing) return;
                             var pos = getPos(e);
                             ctx.lineTo(pos.x, pos.y);
-                            ctx.strokeStyle = '#000080'; // Màu mực xanh đen cực đẹp
+                            ctx.strokeStyle = '#000080';
                             ctx.lineWidth = 3;
                             ctx.lineCap = 'round';
                             ctx.lineJoin = 'round';
@@ -183,52 +198,73 @@
                             e.preventDefault();
                         };
 
-                        // Bind events
                         canvas.addEventListener('mousedown', startDrawing);
                         canvas.addEventListener('mousemove', draw);
                         canvas.addEventListener('mouseup', stopDrawing);
                         canvas.addEventListener('mouseout', stopDrawing);
-
                         canvas.addEventListener('touchstart', startDrawing, {passive: false});
                         canvas.addEventListener('touchmove', draw, {passive: false});
                         canvas.addEventListener('touchend', stopDrawing, {passive: false});
 
-                        // Clear Button
-                        document.getElementById('clear-btn').addEventListener('click', function() {
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        });
-
-                        // Save Button (AJAX to Backend)
-                        document.getElementById('save-btn').addEventListener('click', function() {
-                            // Check if canvas is blank
-                            var blank = document.createElement('canvas');
-                            blank.width = canvas.width;
-                            blank.height = canvas.height;
-                            if(canvas.toDataURL() === blank.toDataURL()) {
-                                alert("Bạn chưa ký! Vui lòng ký trước khi gửi.");
-                                return;
-                            }
-
-                            // Khóa nút để tránh spam
-                            this.innerHTML = "&lt;i class='fa fa-spinner fa-spin'&gt;&lt;/i&gt; Đang xử lý...";
-                            this.disabled = true;
-
-                            var dataURL = canvas.toDataURL("image/png");
-
-                            ajax.jsonRpc('/my/hop_dong/luu_chu_ky', 'call', {
-                                'doc_id': "<t t-esc='hop_dong.id'/>",
-                                'signature': dataURL
-                            }).then(function (result) {
-                                if(result.error) {
-                                    alert("LỖI: " + result.error);
-                                    window.location.reload();
-                                } else {
-                                    alert("Ký thành công! Hợp đồng đã có hiệu lực pháp lý.");
-                                    window.location.href = '/my/hop_dong';
-                                }
+                        var clearBtn = document.getElementById('clear-btn');
+                        if (clearBtn) {
+                            clearBtn.addEventListener('click', function() {
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
                             });
-                        });
-                    });
+                        }
+
+                        var saveBtn = document.getElementById('save-btn');
+                        if (saveBtn) {
+                            saveBtn.addEventListener('click', function() {
+                                var blank = document.createElement('canvas');
+                                blank.width = canvas.width;
+                                blank.height = canvas.height;
+                                if (canvas.toDataURL() === blank.toDataURL()) {
+                                    alert("Oops! Bạn chưa ký vào khung trắng. Vui lòng di chuột vẽ chữ ký trước nhé!");
+                                    return;
+                                }
+
+                                saveBtn.innerHTML = "Đang xử lý...";
+                                saveBtn.disabled = true;
+
+                                var dataURL = canvas.toDataURL("image/png");
+                                var doc_id = saveBtn.getAttribute('data-doc-id');
+
+                                fetch('/my/hop_dong/luu_chu_ky', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        jsonrpc: "2.0",
+                                        method: "call",
+                                        params: { doc_id: parseInt(doc_id), signature: dataURL }
+                                    })
+                                })
+                                .then(function(res) { return res.json(); })
+                                .then(function(data) {
+                                    var result = data.result;
+                                    if (result &amp;&amp; result.error) {
+                                        alert("LỖI ODOO: " + result.error);
+                                        window.location.reload();
+                                    } else {
+                                        alert("Chúc mừng! Bạn đã ký hợp đồng thành công.");
+                                        window.location.href = '/my/hop_dong';
+                                    }
+                                })
+                                .catch(function() {
+                                    alert("Lỗi kết nối mạng, vui lòng thử lại.");
+                                    saveBtn.innerHTML = "Gửi Chữ Ký Xác Nhận";
+                                    saveBtn.disabled = false;
+                                });
+                            });
+                        }
+                        console.log("Canvas Signature Initialized Successfully!");
+                    }
+
+                    // Ép hệ thống nạp Javascript bằng 3 cách để không thể xịt!
+                    initSignature(); 
+                    document.addEventListener("DOMContentLoaded", initSignature);
+                    setTimeout(initSignature, 500);
+                    setTimeout(initSignature, 1500);
                 </script>
             </t>
         </template>

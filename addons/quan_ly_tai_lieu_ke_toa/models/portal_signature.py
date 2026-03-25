@@ -200,16 +200,23 @@ class ResPartner_Extended(models.Model):
             raise UserError('Khách hàng đã có tài khoản portal!')
         
         # Tạo User mới
+        # Bắt đầu với group portal chuẩn
+        group_ids = [self.env.ref('base.group_portal').id]
+        # Thêm group CRM portal nếu tồn tại (tùy chọn)
+        crm_portal_group = self.env.ref(
+            'quan_ly_khach_hang_crm.group_crm_portal_customer',
+            raise_if_not_found=False
+        )
+        if crm_portal_group:
+            group_ids.append(crm_portal_group.id)
+
         user = self.env['res.users'].create({
             'name': self.name,
             'email': self.email,
             'login': self.email,
             'password': 'Portal@2024!',  # Mật khẩu tạm (nên yêu cầu đổi)
             'partner_id': self.id,
-            'groups_id': [(6, 0, [
-                self.env.ref('base.group_portal').id,
-                self.env.ref('quan_ly_khach_hang_crm.group_crm_portal_customer', raise_if_not_found=False).id or 0
-            ])],
+            'groups_id': [(6, 0, group_ids)],
             'active': True
         })
         

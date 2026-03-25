@@ -127,7 +127,8 @@ pdfminer.six
 # AI & LLM Integration for Document Summarization
 anthropic==0.25.6  # Claude API
 openai==1.50.0  # ChatGPT API (fixed version)
-google-generativeai==0.5.0  # Google Gemini API
+google-genai>=1.47.0  # Google Gemini API (NEW: replaces google-generativeai)
+google-generativeai==0.5.0  # Google Gemini API (OLD: kept for compatibility)
 google-auth-httplib2==0.2.0  # Google Cloud Authentication
 google-auth-oauthlib==1.2.0  # Google OAuth
 google-api-python-client==2.100.0  # Google Drive API

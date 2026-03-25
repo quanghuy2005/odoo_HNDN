@@ -26,7 +26,6 @@ class GoogleDriveIntegration(models.Model):
 
     service_account_json = fields.Text(
         string='Service Account JSON',
-        required=True,
         help='Dán nội dung file JSON từ Google Cloud Console'
     )
 
@@ -83,9 +82,9 @@ class GoogleDriveIntegration(models.Model):
         """Test kết nối Google Drive"""
         try:
             service = self._get_drive_service()
-            # Test: Liệt kê 1 file từ folder
+            folder_id = self.thu_muc_cha_id.strip() if self.thu_muc_cha_id else ''
             results = service.files().list(
-                q=f"'{self.thu_muc_cha_id}' in parents",
+                q=f"'{folder_id}' in parents",
                 spaces='drive',
                 pageSize=1,
                 fields='files(id, name)',
@@ -112,10 +111,11 @@ class GoogleDriveIntegration(models.Model):
         try:
             service = self._get_drive_service()
             
+            folder_id = self.thu_muc_cha_id.strip() if self.thu_muc_cha_id else ''
             # Tạo metadata file
             file_metadata = {
                 'name': file_name,
-                'parents': [self.thu_muc_cha_id]
+                'parents': [folder_id]
             }
 
             # Convert file content
@@ -141,7 +141,7 @@ class GoogleDriveIntegration(models.Model):
 
         except Exception as e:
             print(f'Google Drive upload failed: {e}')
-            return None
+            raise Exception(f'Google Server Alert: {str(e)}')
 
     def create_folder_structure(self, folder_name):
         """Tạo thư mục con trên Google Drive"""

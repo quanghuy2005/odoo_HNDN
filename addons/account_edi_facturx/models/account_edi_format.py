@@ -7,7 +7,10 @@ from odoo.exceptions import RedirectWarning, UserError
 
 from datetime import datetime
 from lxml import etree
-from PyPDF2 import PdfFileReader
+try:
+    from PyPDF2 import PdfReader
+except ImportError:
+    from PyPDF2 import PdfFileReader as PdfReader
 import base64
 import markupsafe
 

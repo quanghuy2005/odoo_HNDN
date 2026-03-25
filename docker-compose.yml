@@ -33,6 +33,7 @@ services:
     volumes:
       - /home/quang/TTDN-15-01-N1/addons:/mnt/extra-addons
       - /home/quang/TTDN-15-01-N1:/home/quang/TTDN-15-01-N1
+      - odoo_filestore:/var/lib/odoo/filestore
     restart: unless-stopped
     command: odoo --addons-path=/mnt/extra-addons --database=${POSTGRES_DB:-odoo} --db_user=${POSTGRES_USER:-odoo} --db_password=${POSTGRES_PASSWORD:-odoo} --db_host=postgres-odoo-base-15-01
 
@@ -56,6 +57,7 @@ services:
 #  postgres:
 #    driver: bridge
 
-#volumes:
+volumes:
+  odoo_filestore:
 #    postgres:
 #    pgadmin:

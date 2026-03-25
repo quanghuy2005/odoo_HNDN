@@ -22,8 +22,8 @@
                                 <field name="backup_khi_hoan_tat"/>
                             </group>
                         </group>
-                        <group>
-                            <field name="service_account_json" nolabel="1" colspan="2" widget="ace"/>
+                        <group string="Nội dung mã JSON (Dán file JSON vào đây)">
+                            <field name="service_account_json" nolabel="1" colspan="2"/>
                         </group>
                     </sheet>
                 </form>

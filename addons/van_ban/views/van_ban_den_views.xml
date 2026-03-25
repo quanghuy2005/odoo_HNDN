@@ -6,6 +6,9 @@
             <field name="model">van_ban_den</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <button name="action_xu_ly_ai" string="🤖 Xử Lý AI" type="object" class="btn-secondary" attrs="{'invisible': [('ai_processor_id', '!=', False)]}"/>
+                    </header>
                     <sheet>
                         <div class="oe_read_only" style="font-size:25px">Văn bản đến</div>
                         <group col="4" string="Thông tin chung">
@@ -24,6 +27,22 @@
                         <group string="File đính kèm">
                             <field name="file_dinh_kem" filename="file_name"/>
                             <field name="file_name" invisible="1"/>
+                        </group>
+
+                        <!-- AI RESULTS -->
+                        <separator string="🤖 Kết Quả Xử Lý AI" attrs="{'invisible': [('ai_processor_id', '=', False)]}"/>
+                        <group attrs="{'invisible': [('ai_processor_id', '=', False)]}">
+                            <group>
+                                <field name="ai_processor_id" />
+                                <field name="phan_loai_ai" />
+                                <field name="do_tin_cay_ai" widget="progressbar" />
+                            </group>
+                            <group>
+                                <field name="tu_khoa_ai" nolabel="1" />
+                            </group>
+                            <group>
+                                <field name="tom_tat_ai" nolabel="1" />
+                            </group>
                         </group>
                     </sheet>
                 </form>

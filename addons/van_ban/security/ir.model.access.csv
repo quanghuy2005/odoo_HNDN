@@ -17,3 +17,7 @@ access_van_ban_do_mat_user,van.ban.do_mat.user,model_van_ban_do_mat,van_ban.grou
 access_van_ban_do_mat_manager,van.ban.do_mat.manager,model_van_ban_do_mat,van_ban.group_van_ban_manager,1,1,1,1
 access_van_ban_do_khan_user,van.ban.do_khan.user,model_van_ban_do_khan,van_ban.group_van_ban_user,1,0,0,0
 access_van_ban_do_khan_manager,van.ban.do_khan.manager,model_van_ban_do_khan,van_ban.group_van_ban_manager,1,1,1,1
+access_vanban_pdf_analyzer_user,vanban.pdf.analyzer.user,model_vanban_pdf_analyzer,van_ban.group_van_ban_user,1,1,1,0
+access_vanban_pdf_analyzer_manager,vanban.pdf.analyzer.manager,model_vanban_pdf_analyzer,van_ban.group_van_ban_manager,1,1,1,1
+access_vanban_ai_processor_user,vanban.ai.processor.user,model_vanban_ai_processor,van_ban.group_van_ban_user,1,1,1,0
+access_vanban_ai_processor_manager,vanban.ai.processor.manager,model_vanban_ai_processor,van_ban.group_van_ban_manager,1,1,1,1

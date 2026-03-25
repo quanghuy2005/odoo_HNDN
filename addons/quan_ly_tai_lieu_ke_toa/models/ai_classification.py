@@ -15,7 +15,7 @@ except ImportError:
     OPENAI_AVAILABLE = False
 
 try:
-    import google.generativeai as genai
+    import google.genai as genai
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
@@ -145,12 +145,14 @@ class AIConfiguration(models.Model):
     def _test_gemini(self):
         """Test Gemini API"""
         if not GEMINI_AVAILABLE:
-            raise UserError('Cần cài đặt: pip install google-generativeai')
+            raise UserError('Cần cài đặt: pip install google-genai')
 
         try:
-            genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel(self.model_name)
-            response = model.generate_content("Xin chào, hãy nói lời chào.")
+            client = genai.Client(api_key=self.api_key)
+            response = client.models.generate_content(
+                model=self.model_name or 'models/gemini-2.5-flash-lite',
+                contents="Xin chào, hãy nói lời chào."
+            )
             
             return {
                 'type': 'ir.actions.client',
@@ -231,9 +233,11 @@ Summary:"""
 
     def _tom_tat_gemini(self, prompt):
         """Tóm tắt bằng Gemini"""
-        genai.configure(api_key=self.api_key)
-        model = genai.GenerativeModel(self.model_name)
-        response = model.generate_content(prompt)
+        client = genai.Client(api_key=self.api_key)
+        response = client.models.generate_content(
+            model=self.model_name or 'models/gemini-2.5-flash-lite',
+            contents=prompt
+        )
         return response.text
 
     def phan_loai_tai_lieu(self, noi_dung):

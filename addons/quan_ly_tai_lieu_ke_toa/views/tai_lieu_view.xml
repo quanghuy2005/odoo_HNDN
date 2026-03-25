@@ -84,6 +84,8 @@
                                 <field name="loai_tai_lieu"/>
                                 <field name="khach_hang"/>
                                 <field name="nhan_vien_phu_trach"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="gia_tri_tai_lieu" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
                             <group>
                                 <field name="phien_ban" readonly="1"/>

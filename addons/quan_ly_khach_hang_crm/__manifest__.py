@@ -10,6 +10,8 @@
         'crm',
         'contacts',
         'van_ban',
+        'portal',
+        'website',
     ],
     'data': [
         'views/trang_web_khach_hang.xml',

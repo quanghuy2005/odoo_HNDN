@@ -8,7 +8,10 @@ from odoo.tools import pdf
 from odoo.tests import tagged
 from odoo.tools import file_open
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+try:
+    from PyPDF2 import PdfReader as PdfFileReader, PdfWriter as PdfFileWriter
+except ImportError:
+    from PyPDF2 import PdfFileReader, PdfFileWriter
 
 @tagged('post_install', '-at_install')
 class TestIrActionsReport(AccountTestInvoicingCommon):

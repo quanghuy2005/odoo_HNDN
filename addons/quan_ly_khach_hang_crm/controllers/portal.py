@@ -114,8 +114,8 @@ class KhachHangPortal(CustomerPortal):
         if not hop_dong.exists() or hop_dong.khach_hang.commercial_partner_id.id != request.env.user.partner_id.commercial_partner_id.id:
             return {'error': 'Không có quyền truy cập hợp đồng này.'}
             
-        if hop_dong.trang_thai in ['da_ky', 'hoan_tat', 'het_han']:
-            return {'error': 'Hợp đồng này đã đóng, không thể ký lại.'}
+        if hop_dong.chu_ky_khach_hang or hop_dong.trang_thai in ['hoan_tat', 'het_han', 'huy']:
+            return {'error': 'Hợp đồng này đã đóng hoặc bạn đã ký rồi, không thể ký lại.'}
 
         # Validate signature data format (base64 image headers)
         if not signature or 'data:image' not in signature:
