@@ -8,8 +8,8 @@
             <field name="domain_force">
                 [
                     '|',
-                    ('nhan_vien_phu_trach.danh_sach_khach_hang', 'in', user.employee_ids.danh_sach_khach_hang.ids),
-                    ('nhan_vien_phu_trach', 'in', user.employee_ids.ids)
+                    ('khach_hang.user_id', '=', user.id),
+                    ('nhan_vien_phu_trach.user_id', '=', user.id)
                 ]
             </field>
             <field name="perm_read">True</field>
@@ -19,16 +19,16 @@
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
-        <!-- RULE 2: Sales Manager xem tất cả -->
-        <record id="rule_tai_lieu_manager" model="ir.rule">
-            <field name="name">Tài Liệu - Quản Lý Xem Tất Cả</field>
+        <!-- RULE 2: Admin Tài Liệu xem tất cả -->
+        <record id="rule_tai_lieu_admin" model="ir.rule">
+            <field name="name">Tài Liệu - Admin Xem Tất Cả</field>
             <field name="model_id" ref="model_tai_lieu_ke_toa"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="perm_read">True</field>
             <field name="perm_write">True</field>
             <field name="perm_create">True</field>
             <field name="perm_unlink">True</field>
-            <field name="groups" eval="[(4, ref('base.group_partner_manager'))]"/>
+            <field name="groups" eval="[(4, ref('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin'))]"/>
         </record>
 
         <!-- RULE 3: HR Manager full access -->
@@ -50,8 +50,8 @@
             <field name="domain_force">
                 [
                     '|',
-                    ('tai_lieu.nhan_vien_phu_trach.danh_sach_khach_hang', 'in', user.employee_ids.danh_sach_khach_hang.ids),
-                    ('tai_lieu.nhan_vien_phu_trach', 'in', user.employee_ids.ids)
+                    ('tai_lieu.khach_hang.user_id', '=', user.id),
+                    ('tai_lieu.nhan_vien_phu_trach.user_id', '=', user.id)
                 ]
             </field>
             <field name="perm_read">True</field>
@@ -61,16 +61,16 @@
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
-        <!-- RULE 4b: Phiếu Phê Duyệt - Manager xem tất cả -->
-        <record id="rule_phieu_phe_duyet_manager" model="ir.rule">
-            <field name="name">Phiếu Phê Duyệt - Quản Lý Xem Tất Cả</field>
+        <!-- RULE 4b: Phiếu Phê Duyệt - Admin xem tất cả -->
+        <record id="rule_phieu_phe_duyet_admin" model="ir.rule">
+            <field name="name">Phiếu Phê Duyệt - Admin Xem Tất Cả</field>
             <field name="model_id" ref="model_phieu_phe_duyet"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="perm_read">True</field>
             <field name="perm_write">True</field>
             <field name="perm_create">True</field>
             <field name="perm_unlink">True</field>
-            <field name="groups" eval="[(4, ref('base.group_partner_manager'))]"/>
+            <field name="groups" eval="[(4, ref('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin'))]"/>
         </record>
 
         <!-- RULE 4c: Phiếu Phê Duyệt - HR Manager full access -->
@@ -92,8 +92,8 @@
             <field name="domain_force">
                 [
                     '|',
-                    ('tai_lieu.nhan_vien_phu_trach.danh_sach_khach_hang', 'in', user.employee_ids.danh_sach_khach_hang.ids),
-                    ('tai_lieu.nhan_vien_phu_trach', 'in', user.employee_ids.ids)
+                    ('tai_lieu.khach_hang.user_id', '=', user.id),
+                    ('tai_lieu.nhan_vien_phu_trach.user_id', '=', user.id)
                 ]
             </field>
             <field name="perm_read">True</field>
@@ -103,16 +103,16 @@
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
-        <!-- RULE 5b: File Đính Kèm - Manager xem tất cả -->
-        <record id="rule_dinh_kem_file_manager" model="ir.rule">
-            <field name="name">File Đính Kèm - Quản Lý Xem Tất Cả</field>
+        <!-- RULE 5b: File Đính Kèm - Admin xem tất cả -->
+        <record id="rule_dinh_kem_file_admin" model="ir.rule">
+            <field name="name">File Đính Kèm - Admin Xem Tất Cả</field>
             <field name="model_id" ref="model_dinh_kem_file"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="perm_read">True</field>
             <field name="perm_write">True</field>
             <field name="perm_create">True</field>
             <field name="perm_unlink">True</field>
-            <field name="groups" eval="[(4, ref('base.group_partner_manager'))]"/>
+            <field name="groups" eval="[(4, ref('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin'))]"/>
         </record>
 
         <!-- RULE 5c: File Đính Kèm - HR Manager full access -->

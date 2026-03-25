@@ -29,6 +29,8 @@
         'security/ir.model.access.csv',
         'views/van_ban_den_views.xml',
         'views/van_ban_di_views.xml',
+        'views/ho_so_van_ban_views.xml',
+        'views/ho_so_cong_viec_views.xml',
         'views/danh_muc_views.xml',
         'views/vanban_ai_processor_views.xml',
         'views/menu_views.xml',

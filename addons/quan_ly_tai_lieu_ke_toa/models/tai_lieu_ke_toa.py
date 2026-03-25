@@ -54,6 +54,7 @@ class TaiLieuKeToa(models.Model):
     nhan_vien_phu_trach = fields.Many2one(
         'hr.employee',
         string='Nhân Viên Phụ Trách',
+        default=lambda self: self.env.user.employee_id.id,
         tracking=True
     )
 

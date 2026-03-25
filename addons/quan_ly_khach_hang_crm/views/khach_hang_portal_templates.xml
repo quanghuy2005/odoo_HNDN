@@ -55,7 +55,9 @@
                         <t t-foreach="hop_dongs" t-as="doc">
                             <tr>
                                 <td>
-                                    <span t-field="doc.ten_tai_lieu"/>
+                                    <a t-attf-href="/my/hop_dong/ky/#{doc.id}">
+                                        <span t-field="doc.ten_tai_lieu"/>
+                                    </a>
                                 </td>
                                 <td>
                                     <span class="badge badge-pill badge-info" t-field="doc.trang_thai"/>
@@ -69,14 +71,19 @@
                                             <i class="fa fa-download"/> Tải về
                                         </a>
                                         <br/>
-                                        <!-- Nút Hành Động Ký -->
+                                        <!-- Nút Cập Nhật Trạng Thái -->
+                                        <a t-attf-href="/my/hop_dong/ky/#{doc.id}" class="btn btn-sm btn-info mb-1">
+                                            <i class="fa fa-eye"/> Xem Chi Tiết
+                                        </a>
                                         <t t-if="doc.chu_ky_khach_hang">
-                                            <span class="text-success"><i class="fa fa-check-circle"/> Đã Ký</span>
+                                            <div class="text-success mt-1"><b><i class="fa fa-check-circle"/> Đã Ký</b></div>
                                         </t>
                                         <t t-elif="doc.trang_thai not in ['hoan_tat', 'het_han', 'huy']">
-                                            <a t-attf-href="/my/hop_dong/ky/#{doc.id}" class="btn btn-sm btn-success">
-                                                <i class="fa fa-pencil"/> Ký Xác Nhận
-                                            </a>
+                                            <div class="mt-1">
+                                                <a t-attf-href="/my/hop_dong/ky/#{doc.id}" class="btn btn-sm btn-success">
+                                                    <i class="fa fa-pencil"/> Ký Xác Nhận
+                                                </a>
+                                            </div>
                                         </t>
                                     </t>
                                     <t t-else="">
@@ -122,17 +129,51 @@
                                     <i class="fa fa-info-circle"/> Bằng việc ký vào khung dưới đây, bạn xác nhận đồng ý với các điều khoản trong văn bản. Chữ ký số có giá trị pháp lý tương đương chữ ký tươi.
                                 </div>
 
-                                <!-- KHU VỰC DRAWING CANVAS -->
-                                <div class="text-center mt-4">
-                                    <h5>XIN MỜI KÝ VÀO KHUNG DƯỚI ĐÂY:</h5>
-                                    <div style="border: 2px dashed #007bff; background: #f8f9fa; display: inline-block; padding: 10px; border-radius: 10px;">
-                                        <canvas id="signature-pad" width="600" height="250" style="background: white; border: 1px solid #ccc; cursor: crosshair; touch-action: none;"></canvas>
+                                <!-- HIỂN THỊ CHỮ KÝ ĐẠI DIỆN 2 BÊN -->
+                                <div class="row mt-4 text-center">
+                                    <div class="col-6" style="border-right: 2px dashed #ccc;">
+                                        <h5 class="text-primary">ĐẠI DIỆN CÔNG TY BÁN</h5>
+                                        <t t-if="hop_dong.chu_ky_nguoi_duyet">
+                                            <div class="mt-3">
+                                                <span t-field="hop_dong.chu_ky_nguoi_duyet" t-options="{'widget': 'image', 'style': 'max-height: 100px; padding-bottom: 5px; border-bottom: 1px solid #000;'}"/>
+                                            </div>
+                                            <p class="mt-2 text-muted">Ký bởi: <b t-field="hop_dong.ky_boi.name"/></p>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="mt-4 mb-4 text-muted border p-3 bg-light">
+                                                <i>(Chưa ký duyệt)</i>
+                                            </div>
+                                        </t>
                                     </div>
-                                    <div class="mt-3">
-                                        <button type="button" class="btn btn-secondary" id="clear-btn"><i class="fa fa-eraser"/> Xóa Ký Lại</button>
-                                        <button type="button" class="btn btn-success" id="save-btn" t-att-data-doc-id="hop_dong.id"><i class="fa fa-paper-plane"/> Gửi Chữ Ký Xác Nhận</button>
+                                    <div class="col-6">
+                                        <h5 class="text-success">ĐẠI DIỆN KHÁCH HÀNG</h5>
+                                        <t t-if="hop_dong.chu_ky_khach_hang">
+                                            <div class="mt-3">
+                                                <span t-field="hop_dong.chu_ky_khach_hang" t-options="{'widget': 'image', 'style': 'max-height: 100px; padding-bottom: 5px; border-bottom: 1px solid #000;'}"/>
+                                            </div>
+                                            <p class="mt-2 text-muted">Ký xác nhận: <b t-field="hop_dong.khach_hang.name"/></p>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="mt-4 mb-4 text-muted border p-3 bg-light">
+                                                <i>(Đang chờ ký xác nhận)</i>
+                                            </div>
+                                        </t>
                                     </div>
                                 </div>
+
+                                <!-- KHU VỰC DRAWING CANVAS (CHỈ HIỆN KHI KHÁCH CHƯA KÝ) -->
+                                <t t-if="not hop_dong.chu_ky_khach_hang">
+                                    <div class="text-center mt-4 border-top pt-4">
+                                        <h5>XIN MỜI KÝ VÀO KHUNG DƯỚI ĐÂY:</h5>
+                                        <div style="border: 2px dashed #007bff; background: #f8f9fa; display: inline-block; padding: 10px; border-radius: 10px;">
+                                            <canvas id="signature-pad" width="600" height="250" style="background: white; border: 1px solid #ccc; cursor: crosshair; touch-action: none;"></canvas>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button type="button" class="btn btn-secondary" id="clear-btn"><i class="fa fa-eraser"/> Xóa Ký Lại</button>
+                                            <button type="button" class="btn btn-success" id="save-btn" t-att-data-doc-id="hop_dong.id"><i class="fa fa-paper-plane"/> Gửi Chữ Ký Xác Nhận</button>
+                                        </div>
+                                    </div>
+                                </t>
                             </div>
                         </div>
 

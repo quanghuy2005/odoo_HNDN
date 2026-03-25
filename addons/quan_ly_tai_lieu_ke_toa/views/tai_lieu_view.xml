@@ -36,16 +36,17 @@
                 <form string="Tài Liệu Kế Toán">
                     <!-- HEADER VỚI NÚT HÀNH ĐỘNG -->
                     <header>
-                        <button name="hanh_dong_gui_phe_duyet" string="Gửi Phê Duyệt" 
+                    <button name="hanh_dong_gui_phe_duyet" string="Gửi Đi" 
                             type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'tao_moi')]}"/>
-                        <button name="hanh_dong_yeu_cau_phe_duyet" string="Yêu Cầu Phê Duyệt" 
-                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'da_gui')]}"/>
+                        <button name="hanh_dong_yeu_cau_phe_duyet" string="Yêu Cầu Duyệt" 
+                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', 'not in', ('tao_moi', 'da_gui'))]}"/>
+                        <!-- CHỈ GIÁM ĐỐC (ADMIN) MỚI THẤY & BẤM ĐƯỢC NÚT DUYỆT / KÝ -->
                         <button name="hanh_dong_phe_duyet" string="Phê Duyệt" 
-                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'dang_duyet')]}"/>
-                        <button name="hanh_dong_ky" string="Ký" 
-                            type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', '!=', 'da_phe_duyet')]}"/>
+                            type="object" class="btn-success" attrs="{'invisible': [('trang_thai', '!=', 'dang_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin"/>
+                        <button name="hanh_dong_ky" string="Ký Xác Nhận (Nội bộ)" 
+                            type="object" class="btn-warning" attrs="{'invisible': [('trang_thai', '!=', 'da_phe_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin"/>
                         <button name="hanh_dong_hoan_tat" string="Hoàn Tất" 
-                            type="object" attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"/>
+                            type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"/>
                         <button name="hanh_dong_tao_phien_ban_moi" string="Tạo Phiên Bản Mới" 
                             type="object" attrs="{'invisible': [('trang_thai', 'not in', ['hoan_tat', 'het_han'])]}"/>
                         <button name="hanh_dong_gui_cho_khach" string="Gửi Cho Khách" 
@@ -82,8 +83,9 @@
                         <group string="Thông Tin Cơ Bản">
                             <group>
                                 <field name="loai_tai_lieu"/>
-                                <field name="khach_hang"/>
-                                <field name="nhan_vien_phu_trach"/>
+                                <!-- Ép bộ lọc: Giấu tiệt nhân viên công ty đi, chỉ hiển thị Công ty đối tác (B2B) hoặc Khách đã mua hàng -->
+                                <field name="khach_hang" domain="[('is_company', '=', True)]" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="nhan_vien_phu_trach" readonly="1" force_save="1"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="gia_tri_tai_lieu" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
