@@ -122,25 +122,55 @@ class VanBanAIProcessor(models.Model):
 
             self.write({'trang_thai': 'dang_xu_ly'})
 
-            # Get API key from ai.configuration
-            ai_config = self.env['ai.configuration'].search(
-                [('loai_ai', '=', 'gemini')],
+            # Get API key from vanban.ai.config
+            ai_config = self.env['vanban.ai.config'].search(
+                [('is_active', '=', True)],
                 limit=1
             )
-            
+
             if not ai_config or not ai_config.api_key:
-                raise UserError(_('Chưa cấu hình Google Gemini API Key.\nVào Settings → AI Configuration để cấu hình.'))
+                raise UserError(_('Chưa cấu hình Google Gemini API Key cho Văn Bản.\nVào Cấu Hình → AI API Key để cài đặt.'))
 
             client = genai.Client(api_key=ai_config.api_key)
 
+            # Đọc full text từ file đính kèm PDF nếu có
+            vanban_record = self.env[self.vanban_model].browse(self.vanban_id)
+            full_text = self.noi_dung_cong_van or ''
+
+            if hasattr(vanban_record, 'file_dinh_kem') and vanban_record.file_dinh_kem and vanban_record.file_name and vanban_record.file_name.lower().endswith('.pdf'):
+                try:
+                    import base64
+                    import io
+                    import PyPDF2
+                    file_data = base64.b64decode(vanban_record.file_dinh_kem)
+                    pdf_file = io.BytesIO(file_data)
+                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+
+                    extracted = ""
+                    for i, page in enumerate(pdf_reader.pages):
+                        if i >= 10:  # Giới hạn 10 trang đầu
+                            break
+                        text = page.extract_text()
+                        if text:
+                            extracted += text + "\n"
+                    
+                    if extracted.strip():
+                        # Gộp cả trích yếu và nội dung PDF
+                        full_text = f"Trích yếu: {self.noi_dung_cong_van}\n\nNội dung chi tiết:\n{extracted}"
+                except Exception as e:
+                    _logger.warning(f"Không thể đọc text từ PDF: {str(e)}")
+
+            if not full_text.strip():
+                raise UserError(_('Không có nội dung văn bản để phân tích (Trích yếu trống và không có PDF).'))
+
             # === PHÂN LOẠI ===
-            phan_loai_result = self._classify_vanban(client)
+            phan_loai_result = self._classify_vanban(client, full_text)
 
             # === TRÍCH TỪ KHÓA ===
-            tu_khoa_result = self._extract_keywords(client)
+            tu_khoa_result = self._extract_keywords(client, full_text)
 
             # === TÓM TẮT ===
-            tom_tat_result = self._summarize_vanban(client)
+            tom_tat_result = self._summarize_vanban(client, full_text)
 
             # Lưu kết quả
             self.write({
@@ -160,7 +190,7 @@ class VanBanAIProcessor(models.Model):
                 'loi': str(e)
             })
 
-    def _classify_vanban(self, client):
+    def _classify_vanban(self, client, full_text):
         """
         Phân loại công văn thành các loại: Quyết định, Công văn, Thông báo, v.v.
         """
@@ -177,7 +207,7 @@ class VanBanAIProcessor(models.Model):
             - don_de_nghi: Đơn/Đề nghị
             - khac: Khác
 
-            Nội dung: {self.noi_dung_cong_van[:1000]}
+            Nội dung: {full_text[:3000]}
 
             Trả lời chỉ dưới dạng JSON (không có ký tự khác):
             {{"type": "...", "confidence": 85.0}}
@@ -202,7 +232,7 @@ class VanBanAIProcessor(models.Model):
             _logger.error(f'Lỗi phân loại: {str(e)}')
             return {'type': 'khac', 'confidence': 0.0}
 
-    def _extract_keywords(self, client):
+    def _extract_keywords(self, client, full_text):
         """
         Trích xuất từ khóa/cụm từ quan trọng từ công văn
         """
@@ -211,7 +241,7 @@ class VanBanAIProcessor(models.Model):
             Trích xuất các từ khóa và cụm từ quan trọng từ công văn dưới đây.
             Chỉ trả lại danh sách từ khóa (mỗi từ trên một dòng), không giải thích.
 
-            Nội dung: {self.noi_dung_cong_van[:1500]}
+            Nội dung: {full_text[:3000]}
 
             Từ khóa (mỗi từ một dòng):
             """
@@ -231,7 +261,7 @@ class VanBanAIProcessor(models.Model):
             _logger.error(f'Lỗi trích từ khóa: {str(e)}')
             return {'keywords': '', 'confidence': 0.0}
 
-    def _summarize_vanban(self, client):
+    def _summarize_vanban(self, client, full_text):
         """
         Tóm tắt nội dung công văn thành 2-3 câu
         """
@@ -240,7 +270,7 @@ class VanBanAIProcessor(models.Model):
             Tóm tắt nội dung công văn dưới đây thành 2-3 câu tiếng Việt.
             Giữ lại những thông tin chính yếu nhất.
 
-            Nội dung: {self.noi_dung_cong_van[:2000]}
+            Nội dung: {full_text[:5000]}
 
             Tóm tắt:
             """
