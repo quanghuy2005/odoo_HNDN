@@ -108,22 +108,37 @@
                             </div>
                             <div class="card-body">
                                 <h4>Thông tin Hợp Đồng</h4>
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <th width="30%">Mã Hợp Đồng:</th>
-                                        <td><span t-field="hop_dong.ma_tai_lieu"/></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Tên Hợp Đồng:</th>
-                                        <td><span t-field="hop_dong.ten_tai_lieu"/></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Giá Trị Thỏa Thuận:</th>
-                                        <td class="text-danger font-weight-bold">
-                                            <span t-field="hop_dong.gia_tri_tai_lieu" t-options='{"widget": "monetary", "display_currency": request.env.company.currency_id}'/>
-                                        </td>
-                                    </tr>
-                                </table>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <th width="30%">Mã Hợp Đồng:</th>
+                                                <td><span t-field="hop_dong.ma_tai_lieu"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Tên Hợp Đồng:</th>
+                                                <td><span t-field="hop_dong.ten_tai_lieu"/></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Giá Trị Thỏa Thuận:</th>
+                                                <td class="text-danger font-weight-bold">
+                                                    <span t-field="hop_dong.gia_tri_tai_lieu" t-options='{"widget": "monetary", "display_currency": request.env.company.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <!-- QR CODE XÁC THỰC BẢN CỨNG - TỰ ĐỘNG TẠO -->
+                                        <div style="padding: 10px; border: 1px dashed #007bff; border-radius: 8px; background: #f8f9fa;">
+                                            <img t-att-src="'/report/barcode/?type=QR&amp;value=%s&amp;width=120&amp;height=120' % request.httprequest.url" alt="QR Xác Thực" style="width: 100%; max-width: 120px;"/>
+                                            <div style="font-size: 11px; font-weight: bold; color: #007bff; margin-top: 5px;">
+                                                <i class="fa fa-qrcode" />
+                                                Quét mã QR để<br/>kiểm chứng Bản điện tử Online
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <div class="alert alert-warning mt-4">
                                     <i class="fa fa-info-circle"/> Bằng việc ký vào khung dưới đây, bạn xác nhận đồng ý với các điều khoản trong văn bản. Chữ ký số có giá trị pháp lý tương đương chữ ký tươi.
@@ -137,7 +152,11 @@
                                             <div class="mt-3">
                                                 <span t-field="hop_dong.chu_ky_nguoi_duyet" t-options="{'widget': 'image', 'style': 'max-height: 100px; padding-bottom: 5px; border-bottom: 1px solid #000;'}"/>
                                             </div>
-                                            <p class="mt-2 text-muted">Ký bởi: <b t-field="hop_dong.ky_boi.name"/></p>
+                                            <p class="mt-2 text-muted">Ký bởi: 
+                                                <b t-if="hop_dong.ky_boi" t-field="hop_dong.ky_boi.name"/>
+                                                <b t-elif="hop_dong.phe_duyet_boi" t-field="hop_dong.phe_duyet_boi.name"/>
+                                                <b t-else="">Đại diện Công ty</b>
+                                            </p>
                                         </t>
                                         <t t-else="">
                                             <div class="mt-4 mb-4 text-muted border p-3 bg-light">
@@ -181,6 +200,8 @@
                         <div class="row mt-4 mb-4" id="hop_dong_communication">
                             <div class="col-12">
                                 <h3>Lịch Sử Trao Đổi &amp; Email</h3>
+                                <!-- Khởi tạo Token bảo mật ngầm để Khách hàng có quyền Chat (Vượt quyền Read-only) -->
+                                <t t-set="token" t-value="hop_dong.sudo()._portal_ensure_token()"/>
                                 <t t-call="portal.message_thread">
                                     <t t-set="object" t-value="hop_dong"/>
                                 </t>

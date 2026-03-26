@@ -10,6 +10,7 @@
         'mail',
         'attachment_indexation',
         'hr',
+        'portal',
         'quan_ly_khach_hang_crm',
         'quan_ly_nhan_su_mo_rong',
         'base_automation',

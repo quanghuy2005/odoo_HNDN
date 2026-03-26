@@ -8,7 +8,7 @@ import base64
 class TaiLieuKeToa(models.Model):
     """Model lưu trữ tài liệu của khách hàng"""
     _name = 'tai_lieu.ke_toa'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
     _description = 'Tài Liệu Kế Toán'
     _rec_name = 'ma_tai_lieu'
 
@@ -180,6 +180,17 @@ class TaiLieuKeToa(models.Model):
         help='Trường này giúp tìm kiếm toàn văn bản'
     )
 
+    is_admin_mode = fields.Boolean(
+        string="Là Admin", 
+        compute="_compute_is_admin_mode",
+        default=lambda self: self.env.user.has_group('base.group_system') or self.env.user.has_group('base.group_erp_manager'),
+        help="Dùng để mở khóa ô phân việc trong giao diện"
+    )
+
+    def _compute_is_admin_mode(self):
+        for rec in self:
+            rec.is_admin_mode = self.env.user.has_group('base.group_system') or self.env.user.has_group('base.group_erp_manager')
+
     # One2many
     danh_sach_phieu_phe_duyet = fields.One2many(
         'phieu.phe_duyet',
@@ -305,6 +316,21 @@ class TaiLieuKeToa(models.Model):
                 'ngay_phe_duyet': fields.Datetime.now(),
             })
 
+        # --- TINH NANG MOI (PHASE 4): GUI THONG BAO & NHAC VIEC CHO SALEMAN ---
+        if self.nhan_vien_phu_trach and self.nhan_vien_phu_trach.user_id:
+            # 1. Bắn tin nhắn ting ting vào Odoo
+            msg = f"🔔 <b>SẾP ĐÃ DUYỆT!</b> Sếp {self.env.user.name} vừa Phê duyệt xong tài liệu <b>{self.ma_tai_lieu}</b>. Yêu cầu triển khai gửi cho Khách hàng ký ngay!"
+            self.message_post(body=msg, partner_ids=[self.nhan_vien_phu_trach.user_id.partner_id.id])
+            
+            # 2. Đặt Lịch nhắc nhở (Đồng hồ màu xanh trên góc màn hình)
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                user_id=self.nhan_vien_phu_trach.user_id.id,
+                date_deadline=fields.Date.today(),
+                summary='Sếp đã duyệt Hợp đồng!',
+                note='Anh Dũng/GĐ đã duyệt. Nhanh tay lấy link Portal gửi qua Zalo / Email cho khách hàng nhé!'
+            )
+
     def hanh_dong_ky(self):
         """Ký tài liệu"""
         if self.trang_thai != 'da_phe_duyet':
@@ -319,8 +345,9 @@ class TaiLieuKeToa(models.Model):
 
     def hanh_dong_hoan_tat(self):
         """Hoàn tất tài liệu"""
-        if self.trang_thai != 'da_ky':
-            raise UserError('Chỉ tài liệu đã ký mới có thể hoàn tất!')
+        # Sửa logic: Cho phép hoàn tất nếu ĐÃ KÝ NỘI BỘ (da_ky) HOẶC KHÁCH HÀNG ĐÃ KÝ (chu_ky_khach_hang)
+        if self.trang_thai != 'da_ky' and not self.chu_ky_khach_hang:
+            raise UserError('Chỉ tài liệu đã duyệt và ký (nội bộ hoặc khách hàng) mới có thể hoàn tất!')
         
         self.write({
             'trang_thai': 'hoan_tat',

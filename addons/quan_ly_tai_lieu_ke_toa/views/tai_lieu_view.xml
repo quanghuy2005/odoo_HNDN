@@ -46,7 +46,7 @@
                         <button name="hanh_dong_ky" string="Ký Xác Nhận (Nội bộ)" 
                             type="object" class="btn-warning" attrs="{'invisible': [('trang_thai', '!=', 'da_phe_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin"/>
                         <button name="hanh_dong_hoan_tat" string="Hoàn Tất" 
-                            type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'da_ky')]}"/>
+                            type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'da_ky'), '|', ('trang_thai', '!=', 'da_phe_duyet'), ('chu_ky_khach_hang', '=', False)]}"/>
                         <button name="hanh_dong_tao_phien_ban_moi" string="Tạo Phiên Bản Mới" 
                             type="object" attrs="{'invisible': [('trang_thai', 'not in', ['hoan_tat', 'het_han'])]}"/>
                         <button name="hanh_dong_gui_cho_khach" string="Gửi Cho Khách" 
@@ -83,9 +83,11 @@
                         <group string="Thông Tin Cơ Bản">
                             <group>
                                 <field name="loai_tai_lieu"/>
-                                <!-- Ép bộ lọc: Giấu tiệt nhân viên công ty đi, chỉ hiển thị Công ty đối tác (B2B) hoặc Khách đã mua hàng -->
-                                <field name="khach_hang" domain="[('is_company', '=', True)]" options="{'no_create': True, 'no_open': True}"/>
-                                <field name="nhan_vien_phu_trach" readonly="1" force_save="1"/>
+                                <!-- Mở khóa domain để chọn được cả Cá nhân và Công ty -->
+                                <field name="khach_hang" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="is_admin_mode" invisible="1"/>
+                                <!-- Cực xịn: Khóa cứng bình thường, nhưng nếu là Admin thì mở cho sửa -->
+                                <field name="nhan_vien_phu_trach" attrs="{'readonly': [('is_admin_mode', '=', False)]}" force_save="1"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="gia_tri_tai_lieu" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>

@@ -241,15 +241,23 @@ class ResPartner_Extended(models.Model):
         if not self.user_portal_id:
             raise UserError('Khách hàng chưa có tài khoản portal!')
         
-        # Gửi email reset password
-        self.user_portal_id.action_send_reset_password_email()
+        # Gửi email reset password bằng hàm chuẩn của Odoo (auth_signup)
+        try:
+            self.user_portal_id.action_reset_password()
+            msg = _(f'Đã gửi Link Reset Mật khẩu thành công tới email: {self.email_portal}')
+            msg_type = 'success'
+        except Exception as e:
+            # Bắt lỗi SMTP (Chưa cài máy chủ Email gửi đi) để Odoo không bị sập màn hình đỏ rực
+            msg = _(f'Tạo Link đổi Pass thành công! NHƯNG LỖI GỬI MAIL (Do chưa cài đặt SMTP Server).\nChi tiết lỗi: {str(e)[:50]}...')
+            msg_type = 'warning'
         
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Link Reset Được Gửi!'),
-                'message': _('Email reset password đã được gửi.'),
-                'type': 'success',
+                'title': _('Yêu Cầu Reset Mật Khẩu'),
+                'message': msg,
+                'type': msg_type,
             }
         }
+

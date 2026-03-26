@@ -125,11 +125,29 @@ class KhachHangPortal(CustomerPortal):
             # Tách lấy thuật toán Base64 từ đoạn mã Data URL (VD: data:image/png;base64,iVBORw0KGgo...)
             signature_data = signature.split(',')[1]
             
-            # Lưu CSDL
+            # 1. Lưu CSDL Chữ ký ảnh
             hop_dong.write({
                 'chu_ky_khach_hang': signature_data,
-                'ngay_khach_ky': fields.Datetime.now()
+                'ngay_khach_ky': fields.Datetime.now(),
+                'co_yeu_cau_ky': True, # Cập nhật cờ để tính toán trạng thái ký đúng
             })
+            
+            # 2. Tạo bản ghi Tracking ở bảng Phân Tích (Ký Điện Tử)
+            request.env['tai_lieu.ky_digital'].sudo().create({
+                'tai_lieu': hop_dong.id,
+                'khach_hang_ky': hop_dong.khach_hang.id,
+                'user_ky': request.env.user.id,
+                'email_ky': request.env.user.partner_id.email,
+                'trang_thai_ky': 'da_ky'
+            })
+
+            # 3. TỰ ĐỘNG CHUYỂN TRẠNG THÁI THEO YÊU CẦU CỦA GIÁM ĐỐC
+            if hop_dong.trang_thai == 'da_ky':
+                # Nếu Admin đã ký Nội bộ xong r, Khách chốt Ký cuối -> Tự Tự đóng Hợp đồng (Hoàn Tất) và Xuất Hóa Đơn luôn!
+                hop_dong.hanh_dong_hoan_tat()
+            elif hop_dong.trang_thai == 'da_phe_duyet':
+                # Nếu Khách lanh chanh ký trước khi Admin ký mộc, tiến Hợp đồng lên 1 nấc "Đã Ký" chờ Admin ấn Hoàn Tất
+                hop_dong.write({'trang_thai': 'da_ky', 'da_ky': True})
             
             # Báo về Chatter hệ thống để Giám đốc biết Khách vừa ký
             tgs = fields.Datetime.now().strftime("%d/%m/%Y %H:%M:%S")
