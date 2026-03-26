@@ -42,9 +42,9 @@
                             type="object" class="oe_highlight" attrs="{'invisible': [('trang_thai', 'not in', ('tao_moi', 'da_gui'))]}"/>
                         <!-- CHỈ GIÁM ĐỐC (ADMIN) MỚI THẤY & BẤM ĐƯỢC NÚT DUYỆT / KÝ -->
                         <button name="hanh_dong_phe_duyet" string="Phê Duyệt" 
-                            type="object" class="btn-success" attrs="{'invisible': [('trang_thai', '!=', 'dang_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin"/>
+                            type="object" class="btn-success" attrs="{'invisible': [('trang_thai', '!=', 'dang_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin,base.group_system"/>
                         <button name="hanh_dong_ky" string="Ký Xác Nhận (Nội bộ)" 
-                            type="object" class="btn-warning" attrs="{'invisible': [('trang_thai', '!=', 'da_phe_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin"/>
+                            type="object" class="btn-warning" attrs="{'invisible': [('trang_thai', '!=', 'da_phe_duyet')]}" groups="quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin,base.group_system"/>
                         <button name="hanh_dong_hoan_tat" string="Hoàn Tất" 
                             type="object" class="btn-primary" attrs="{'invisible': [('trang_thai', '!=', 'da_ky'), '|', ('trang_thai', '!=', 'da_phe_duyet'), ('chu_ky_khach_hang', '=', False)]}"/>
                         <button name="hanh_dong_tao_phien_ban_moi" string="Tạo Phiên Bản Mới" 
@@ -83,9 +83,13 @@
                         <group string="Thông Tin Cơ Bản">
                             <group>
                                 <field name="loai_tai_lieu"/>
-                                <!-- Mở khóa domain để chọn được cả Cá nhân và Công ty -->
-                                <field name="khach_hang" options="{'no_create': True, 'no_open': True}"/>
+                                <!-- Nếu LÀ Admin: Cho phép chọn TẤT CẢ khách hàng (không bị gò bó domain) -->
+                                <field name="khach_hang" options="{'no_create': True, 'no_open': True}" attrs="{'invisible': [('is_admin_mode', '=', False)]}"/>
+                                <!-- Nếu KHÔNG PHẢI Admin: CHỈ chọn được khách của chính mình (nhân viên/quản lý) -->
+                                <field name="khach_hang" options="{'no_create': True, 'no_open': True}" domain="[('user_id', '=', uid)]" attrs="{'invisible': [('is_admin_mode', '=', True)]}"/>
+                                
                                 <field name="is_admin_mode" invisible="1"/>
+                                <field name="is_mitchell_signer" invisible="1"/>
                                 <!-- Cực xịn: Khóa cứng bình thường, nhưng nếu là Admin thì mở cho sửa -->
                                 <field name="nhan_vien_phu_trach" attrs="{'readonly': [('is_admin_mode', '=', False)]}" force_save="1"/>
                                 <field name="currency_id" invisible="1"/>
@@ -147,7 +151,7 @@
                                 <div class="row">
                                     <div class="col-6 text-center">
                                         <h4>CHỮ KÝ ĐẠI DIỆN CÔNG TY</h4>
-                                        <field name="chu_ky_nguoi_duyet" widget="signature" attrs="{'readonly': [('trang_thai', 'in', ['da_ky', 'hoan_tat', 'het_han'])]}"/>
+                                        <field name="chu_ky_nguoi_duyet" widget="signature" attrs="{'readonly': ['|', ('is_admin_mode', '=', False), ('trang_thai', 'in', ['da_ky', 'hoan_tat', 'het_han'])]}"/>
                                         <div><i>(Giám đốc dùng chuột vẽ vào khung trên)</i></div>
                                     </div>
                                     <div class="col-6 text-center">

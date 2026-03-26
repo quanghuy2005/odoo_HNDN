@@ -12,6 +12,22 @@ class TaiLieuKeToa(models.Model):
     _description = 'Tài Liệu Kế Toán'
     _rec_name = 'ma_tai_lieu'
 
+    # Chỉ duy nhất user Giám đốc này được ký nội bộ
+    _ALLOWED_SIGNER_NAME = 'Mitchell Admin'
+
+    def _is_allowed_signer(self):
+        """Kiểm tra user hiện tại có phải tài khoản giám đốc được phép ký hay không."""
+        user = self.env.user
+        user_name = (user.name or '').strip().lower()
+        user_login = (user.login or '').strip().lower()
+        allowed_name = self._ALLOWED_SIGNER_NAME.strip().lower()
+
+        return bool(
+            user_name == allowed_name
+            or user_login in {'admin', 'mitchell', 'mitchell.admin'}
+            or (user.has_group('base.group_system') and 'mitchell' in user_name)
+        )
+
     # Thông tin cơ bản
     ma_tai_lieu = fields.Char(
         string='Mã Tài Liệu',
@@ -183,13 +199,24 @@ class TaiLieuKeToa(models.Model):
     is_admin_mode = fields.Boolean(
         string="Là Admin", 
         compute="_compute_is_admin_mode",
-        default=lambda self: self.env.user.has_group('base.group_system') or self.env.user.has_group('base.group_erp_manager'),
+        default=lambda self: self.env.user.has_group('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin') or self.env.user.has_group('base.group_system'),
         help="Dùng để mở khóa ô phân việc trong giao diện"
+    )
+
+    is_mitchell_signer = fields.Boolean(
+        string="Là Người Ký Giám Đốc",
+        compute="_compute_is_mitchell_signer",
+        help="Chỉ tài khoản giám đốc (Mitchell) mới được ký nội bộ"
     )
 
     def _compute_is_admin_mode(self):
         for rec in self:
-            rec.is_admin_mode = self.env.user.has_group('base.group_system') or self.env.user.has_group('base.group_erp_manager')
+            rec.is_admin_mode = self.env.user.has_group('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin') or self.env.user.has_group('base.group_system')
+
+    def _compute_is_mitchell_signer(self):
+        is_signer = self._is_allowed_signer()
+        for rec in self:
+            rec.is_mitchell_signer = is_signer
 
     # One2many
     danh_sach_phieu_phe_duyet = fields.One2many(
@@ -299,6 +326,9 @@ class TaiLieuKeToa(models.Model):
 
     def hanh_dong_phe_duyet(self):
         """Phê duyệt tài liệu"""
+        if not self.env.user.has_group('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin') and not self.env.user.has_group('base.group_system'):
+            raise UserError('Chỉ có Admin (Ban Giám Đốc) mới có quyền Phê duyệt tài liệu!')
+
         if self.trang_thai != 'dang_duyet':
             raise UserError('Tài liệu không ở trạng thái đang phê duyệt!')
         
@@ -314,6 +344,7 @@ class TaiLieuKeToa(models.Model):
             phieu.write({
                 'trang_thai_phieu': 'approved',
                 'ngay_phe_duyet': fields.Datetime.now(),
+                'nguoi_phe_duyet': self.env.user.id,
             })
 
         # --- TINH NANG MOI (PHASE 4): GUI THONG BAO & NHAC VIEC CHO SALEMAN ---
@@ -333,6 +364,9 @@ class TaiLieuKeToa(models.Model):
 
     def hanh_dong_ky(self):
         """Ký tài liệu"""
+        if not self._is_allowed_signer():
+            raise UserError('Chỉ duy nhất tài khoản Giám đốc Mitchell mới có quyền Ký xác nhận tài liệu!')
+
         if self.trang_thai != 'da_phe_duyet':
             raise UserError('Chỉ tài liệu đã phê duyệt mới có thể ký!')
         

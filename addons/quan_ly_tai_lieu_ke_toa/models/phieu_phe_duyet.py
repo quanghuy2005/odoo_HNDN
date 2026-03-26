@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields
-
+from odoo.exceptions import UserError
 
 class PhieuPheDuyet(models.Model):
     """Model lưu trữ phiếu phê duyệt"""
@@ -56,17 +56,26 @@ class PhieuPheDuyet(models.Model):
     # Methods
     def hanh_dong_phe_duyet(self):
         """Phê duyệt"""
+        # Kiểm tra trước khi duyệt bằng phiếu
+        if not self.env.user.has_group('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin') and not self.env.user.has_group('base.group_system'):
+            raise UserError('Chỉ có Admin (Ban Giám Đốc) mới có quyền Phê duyệt!')
+
         self.write({
             'trang_thai_phieu': 'approved',
             'ngay_phe_duyet': fields.Datetime.now(),
+            'nguoi_phe_duyet': self.env.user.id,
         })
         self.tai_lieu.hanh_dong_phe_duyet()
 
     def hanh_dong_tu_choi(self):
         """Từ chối phê duyệt"""
+        if not self.env.user.has_group('quan_ly_tai_lieu_ke_toa.group_quan_ly_tai_lieu_admin') and not self.env.user.has_group('base.group_system'):
+            raise UserError('Chỉ có Admin (Ban Giám Đốc) mới có quyền Từ chối phê duyệt!')
+
         self.write({
             'trang_thai_phieu': 'rejected',
             'ngay_phe_duyet': fields.Datetime.now(),
+            'nguoi_phe_duyet': self.env.user.id,
         })
 
     def hanh_dong_bo_qua(self):

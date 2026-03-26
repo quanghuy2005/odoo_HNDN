@@ -8,8 +8,10 @@
             <field name="domain_force">
                 [
                     '|',
+                    '|',
                     ('khach_hang.user_id', '=', user.id),
-                    ('nhan_vien_phu_trach.user_id', '=', user.id)
+                    ('nhan_vien_phu_trach.user_id', '=', user.id),
+                    ('create_uid', '=', user.id)
                 ]
             </field>
             <field name="perm_read">True</field>
@@ -50,8 +52,10 @@
             <field name="domain_force">
                 [
                     '|',
+                    '|',
                     ('tai_lieu.khach_hang.user_id', '=', user.id),
-                    ('tai_lieu.nhan_vien_phu_trach.user_id', '=', user.id)
+                    ('tai_lieu.nhan_vien_phu_trach.user_id', '=', user.id),
+                    ('tai_lieu.create_uid', '=', user.id)
                 ]
             </field>
             <field name="perm_read">True</field>
@@ -92,8 +96,10 @@
             <field name="domain_force">
                 [
                     '|',
+                    '|',
                     ('tai_lieu.khach_hang.user_id', '=', user.id),
-                    ('tai_lieu.nhan_vien_phu_trach.user_id', '=', user.id)
+                    ('tai_lieu.nhan_vien_phu_trach.user_id', '=', user.id),
+                    ('tai_lieu.create_uid', '=', user.id)
                 ]
             </field>
             <field name="perm_read">True</field>
